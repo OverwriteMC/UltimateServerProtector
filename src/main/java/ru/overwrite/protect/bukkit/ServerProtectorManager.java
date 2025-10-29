@@ -201,7 +201,10 @@ public class ServerProtectorManager extends JavaPlugin {
     protected void registerListeners(PluginManager pluginManager) {
         Plugin plugin = this;
         if (paper && pluginConfig.getSecureSettings().useFakePlugin()) {
-            plugin = FakePlugin.createFakePlugin();
+            Plugin fakePlugin = FakePlugin.createFakePlugin();
+            if (fakePlugin != null) {
+                plugin = fakePlugin;
+            }
         }
         pluginManager.registerEvents(new ChatListener(this), plugin);
         pluginManager.registerEvents(new ConnectionListener(this), plugin);

@@ -56,7 +56,7 @@ public class FakePlugin extends JavaPlugin {
 
             return plugin;
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            return null;
         }
     }
 
