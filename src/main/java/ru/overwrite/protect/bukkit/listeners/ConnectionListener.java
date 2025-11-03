@@ -6,6 +6,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
 import org.bukkit.plugin.RegisteredListener;
+import ru.overwrite.protect.bukkit.PasswordHandler;
 import ru.overwrite.protect.bukkit.ServerProtectorManager;
 import ru.overwrite.protect.bukkit.api.CaptureReason;
 import ru.overwrite.protect.bukkit.api.ServerProtectorAPI;
@@ -20,6 +21,7 @@ public class ConnectionListener implements Listener {
 
     private final ServerProtectorManager plugin;
     private final ServerProtectorAPI api;
+    private final PasswordHandler passwordHandler;
     private final Config pluginConfig;
 
     private final Runner runner;
@@ -27,6 +29,7 @@ public class ConnectionListener implements Listener {
     public ConnectionListener(ServerProtectorManager plugin) {
         this.plugin = plugin;
         this.api = plugin.getApi();
+        this.passwordHandler = plugin.getPasswordHandler();
         this.pluginConfig = plugin.getPluginConfig();
         this.runner = plugin.getRunner();
     }
@@ -152,6 +155,7 @@ public class ConnectionListener implements Listener {
             if (pluginConfig.getPunishSettings().enableRejoin()) {
                 handleRejoin(playerName);
             }
+            passwordHandler.getBossbars().remove(player.getName());
         }
         plugin.getPerPlayerTime().removeInt(playerName);
         api.unsavePlayer(playerName);
@@ -165,6 +169,7 @@ public class ConnectionListener implements Listener {
         if (attempts > pluginConfig.getPunishSettings().maxRejoins()) {
             plugin.checkFail(playerName, pluginConfig.getCommands().failedRejoin());
             api.clearRejoins(playerName);
+            passwordHandler.getAttempts().removeInt(playerName);
         }
     }
 }
