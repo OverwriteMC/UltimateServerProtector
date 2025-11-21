@@ -115,7 +115,7 @@ public class Utils {
     public void checkUpdates(ServerProtectorManager plugin, Consumer<String> consumer) {
         plugin.getRunner().runDelayedAsync(() -> {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    new URL("https://raw.githubusercontent.com/Overwrite987/UltimateServerProtector/master/VERSION")
+                    new URL("https://raw.githubusercontent.com/OverwriteMC/UltimateServerProtector/master/VERSION")
                             .openStream()))) {
                 consumer.accept(reader.readLine().trim());
             } catch (IOException ex) {
