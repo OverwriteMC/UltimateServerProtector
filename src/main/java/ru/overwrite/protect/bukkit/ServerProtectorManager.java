@@ -223,6 +223,7 @@ public class ServerProtectorManager extends JavaPlugin {
         if (paper && mainSettings.getBoolean("use-command", true)) {
             try {
                 CommandMap commandMap = server.getCommandMap();
+                commandMap.getKnownCommands().remove("pas");
                 Constructor<PluginCommand> constructor = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
                 constructor.setAccessible(true);
                 PluginCommand command = constructor.newInstance(mainSettings.getString("pas-command", "pas"), this);
@@ -233,7 +234,7 @@ public class ServerProtectorManager extends JavaPlugin {
                 pluginManager.disablePlugin(this);
             }
         } else {
-            pluginLogger.info("Command for password entering will not be registered.");
+            getCommand("pas").setExecutor(new PasCommand(this));
         }
         PluginCommand uspCommand = getCommand("ultimateserverprotector");
         UspCommand uspCommandClass = new UspCommand(this);

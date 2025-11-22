@@ -15,13 +15,11 @@ import java.util.List;
 
 public class ChatListener implements Listener {
 
-    private final ServerProtectorManager plugin;
     private final ServerProtectorAPI api;
     private final PasswordHandler passwordHandler;
     private final Config pluginConfig;
 
     public ChatListener(ServerProtectorManager plugin) {
-        this.plugin = plugin;
         this.pluginConfig = plugin.getPluginConfig();
         this.passwordHandler = plugin.getPasswordHandler();
         this.api = plugin.getApi();
@@ -51,10 +49,6 @@ public class ChatListener implements Listener {
         String label = cutCommand(message);
         if (pluginConfig.getMainSettings().useCommand()) {
             if (label.equalsIgnoreCase("/" + pluginConfig.getMainSettings().pasCommand())) {
-                if (!plugin.isPaper()) {
-                    passwordHandler.checkPassword(player, cutArguments(message), false);
-                    e.setCancelled(true);
-                }
                 return;
             }
         }
@@ -71,10 +65,5 @@ public class ChatListener implements Listener {
     private String cutCommand(String str) {
         int index = str.indexOf(' ');
         return index == -1 ? str : str.substring(0, index);
-    }
-
-    private String cutArguments(String str) {
-        int index = str.indexOf(' ');
-        return index == -1 ? str : str.substring(index + 1);
     }
 }
