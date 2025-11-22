@@ -220,21 +220,25 @@ public class ServerProtectorManager extends JavaPlugin {
     }
 
     protected void registerCommands(PluginManager pluginManager, ConfigurationSection mainSettings) {
-        if (paper && mainSettings.getBoolean("use-command", true)) {
-            try {
-                CommandMap commandMap = server.getCommandMap();
-                commandMap.getKnownCommands().remove("pas");
-                Constructor<PluginCommand> constructor = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
-                constructor.setAccessible(true);
-                PluginCommand command = constructor.newInstance(mainSettings.getString("pas-command", "pas"), this);
-                command.setExecutor(new PasCommand(this));
-                commandMap.register(getDescription().getName(), command);
-            } catch (Exception ex) {
-                pluginLogger.info("Unable to register password command! " + ex.getMessage());
-                pluginManager.disablePlugin(this);
+        if (mainSettings.getBoolean("use-command", true)) {
+            if (paper) {
+                try {
+                    CommandMap commandMap = server.getCommandMap();
+                    commandMap.getKnownCommands().remove("pas");
+                    Constructor<PluginCommand> constructor = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
+                    constructor.setAccessible(true);
+                    PluginCommand command = constructor.newInstance(mainSettings.getString("pas-command", "pas"), this);
+                    command.setExecutor(new PasCommand(this));
+                    commandMap.register(getDescription().getName(), command);
+                } catch (Exception ex) {
+                    pluginLogger.info("Unable to register password command! " + ex.getMessage());
+                    pluginManager.disablePlugin(this);
+                }
+            } else {
+                getCommand("pas").setExecutor(new PasCommand(this));
             }
         } else {
-            getCommand("pas").setExecutor(new PasCommand(this));
+            pluginLogger.info("Command for password entering will not be registered.");
         }
         PluginCommand uspCommand = getCommand("ultimateserverprotector");
         UspCommand uspCommandClass = new UspCommand(this);
