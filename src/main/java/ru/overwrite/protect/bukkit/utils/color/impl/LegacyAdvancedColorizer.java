@@ -102,7 +102,7 @@ public class LegacyAdvancedColorizer implements Colorizer {
         int end = start + length;
         for (int i = start; i < end; i++) {
             char c = chars[i];
-            if (!HEX_CHARS[c]) {
+            if (c >= 128 || !HEX_CHARS[c]) {
                 return false;
             }
         }
@@ -136,7 +136,7 @@ public class LegacyAdvancedColorizer implements Colorizer {
     }
 
     private boolean isValidColorCharacter(char c) {
-        return COLOR_CHARS_FLAGS[c];
+        return c < 128 && COLOR_CHARS_FLAGS[c];
     }
 
     private void appendRemainingColorTags(StringBuilder builder, boolean isColor, boolean isHashtag, boolean isDoubleTag) {
