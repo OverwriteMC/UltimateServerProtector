@@ -21,6 +21,7 @@ public final class ServerProtector extends ServerProtectorManager {
         setupProxy(mainSettings);
         loadConfigs(config);
         PluginManager pluginManager = server.getPluginManager();
+        setupRunner(pluginManager);
         checkSafe(pluginManager);
         checkPaper();
         registerListeners(pluginManager);
