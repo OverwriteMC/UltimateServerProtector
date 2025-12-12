@@ -1,4 +1,4 @@
-package ru.overwrite.protect.bukkit.utils.color;
+package ru.overwrite.protect.bukkit.color;
 
 public interface Colorizer {
 

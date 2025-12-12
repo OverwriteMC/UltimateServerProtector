@@ -18,6 +18,7 @@ import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.NotNull;
 import ru.overwrite.protect.bukkit.api.CaptureReason;
 import ru.overwrite.protect.bukkit.api.ServerProtectorAPI;
+import ru.overwrite.protect.bukkit.color.ColorizerProvider;
 import ru.overwrite.protect.bukkit.commands.PasCommand;
 import ru.overwrite.protect.bukkit.commands.UspCommand;
 import ru.overwrite.protect.bukkit.configuration.Config;
@@ -148,7 +149,7 @@ public class ServerProtectorManager extends JavaPlugin {
 
     protected void loadConfigs(FileConfiguration config) {
         this.config = config;
-        Utils.setupColorizer(config.getConfigurationSection("main-settings"));
+        ColorizerProvider.init(config.getConfigurationSection("main-settings"));
         final ConfigurationSection fileSettings = config.getConfigurationSection("file-settings");
         boolean fullPath = fileSettings.getBoolean("use-full-path", false);
         String absolutePath = getDataFolder().getAbsolutePath();
@@ -165,7 +166,7 @@ public class ServerProtectorManager extends JavaPlugin {
     public void reloadConfigs(FileConfiguration config) {
         runner.runAsync(() -> {
             this.config = config;
-            Utils.setupColorizer(config.getConfigurationSection("main-settings"));
+            ColorizerProvider.init(config.getConfigurationSection("main-settings"));
             String absolutePath = getDataFolder().getAbsolutePath();
             messageFile = pluginConfig.getFile(absolutePath, "message.yml");
             final ConfigurationSection fileSettings = config.getConfigurationSection("file-settings");

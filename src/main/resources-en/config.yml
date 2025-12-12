@@ -2,7 +2,6 @@
 main-settings:
   # Text formatting.
   # LEGACY - color using & and hex &#
-  # LEGACY_ADVANCED - an improved version of LEGACY with support for &## hex format
   # MINIMESSAGE - color using <color> (introduced in newer versions (1.17+))
   serializer: LEGACY
   # If set to true - messages will be broadcasted to all servers on the proxy network.

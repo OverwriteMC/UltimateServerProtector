@@ -3,14 +3,8 @@ package ru.overwrite.protect.bukkit.utils;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import ru.overwrite.protect.bukkit.ServerProtectorManager;
-import ru.overwrite.protect.bukkit.utils.color.Colorizer;
-import ru.overwrite.protect.bukkit.utils.color.impl.LegacyAdvancedColorizer;
-import ru.overwrite.protect.bukkit.utils.color.impl.LegacyColorizer;
-import ru.overwrite.protect.bukkit.utils.color.impl.MiniMessageColorizer;
-import ru.overwrite.protect.bukkit.utils.color.impl.VanillaColorizer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,17 +36,6 @@ public class Utils {
             folia = false;
         }
         FOLIA = folia;
-    }
-
-    public Colorizer COLORIZER;
-
-    public void setupColorizer(ConfigurationSection mainSettings) {
-        COLORIZER = switch (mainSettings.getString("serializer", "LEGACY").toUpperCase()) {
-            case "MINIMESSAGE" -> new MiniMessageColorizer();
-            case "LEGACY" -> SUB_VERSION >= 16 ? new LegacyColorizer() : new VanillaColorizer();
-            case "LEGACY_ADVANCED" -> new LegacyAdvancedColorizer();
-            default -> new VanillaColorizer();
-        };
     }
 
     public String getIp(Player player) {
@@ -87,29 +70,6 @@ public class Utils {
         float volume = soundArgs.length >= 2 ? Float.parseFloat(soundArgs[1]) : 1.0F;
         float pitch = soundArgs.length == 3 ? Float.parseFloat(soundArgs[2]) : 1.0F;
         player.playSound(player.getLocation(), sound, volume, pitch);
-    }
-
-    public final char COLOR_CHAR = '§';
-
-    public String translateAlternateColorCodes(char altColorChar, String textToTranslate) {
-        final char[] b = textToTranslate.toCharArray();
-
-        for (int i = 0, length = b.length - 1; i < length; i++) {
-            if (b[i] == altColorChar && isValidColorCharacter(b[i + 1])) {
-                b[i++] = COLOR_CHAR;
-                b[i] |= 0x20;
-            }
-        }
-
-        return new String(b);
-    }
-
-    private boolean isValidColorCharacter(char c) {
-        return switch (c) {
-            case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D',
-                 'E', 'F', 'r', 'R', 'k', 'K', 'l', 'L', 'm', 'M', 'n', 'N', 'o', 'O', 'x', 'X' -> true;
-            default -> false;
-        };
     }
 
     public void checkUpdates(ServerProtectorManager plugin, Consumer<String> consumer) {

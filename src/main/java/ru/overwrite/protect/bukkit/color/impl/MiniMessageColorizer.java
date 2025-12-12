@@ -1,9 +1,9 @@
-package ru.overwrite.protect.bukkit.utils.color.impl;
+package ru.overwrite.protect.bukkit.color.impl;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import ru.overwrite.protect.bukkit.utils.color.Colorizer;
+import ru.overwrite.protect.bukkit.color.Colorizer;
 
 public class MiniMessageColorizer implements Colorizer {
 

@@ -10,6 +10,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import ru.overwrite.protect.bukkit.ServerProtectorManager;
+import ru.overwrite.protect.bukkit.color.ColorizerProvider;
 import ru.overwrite.protect.bukkit.configuration.data.*;
 import ru.overwrite.protect.bukkit.logging.Logger;
 import ru.overwrite.protect.bukkit.utils.Utils;
@@ -619,9 +620,9 @@ public final class Config {
 
     public String getMessage(ConfigurationSection section, String key) {
         if (section == null) {
-            return Utils.COLORIZER.colorize("&4&lERROR&r: " + key + " does not exist!");
+            return ColorizerProvider.COLORIZER.colorize("&4&lERROR&r: " + key + " does not exist!");
         }
-        return Utils.COLORIZER.colorize(section.getString(key, "&4&lERROR&r: " + key + " does not exist!").replace("%prefix%", mainSettings.prefix()));
+        return ColorizerProvider.COLORIZER.colorize(section.getString(key, "&4&lERROR&r: " + key + " does not exist!").replace("%prefix%", mainSettings.prefix()));
     }
 
     public FileConfiguration getFile(String path, String fileName) {
