@@ -15,7 +15,7 @@ public final class ServerProtector extends ServerProtectorManager {
     public void onEnable() {
         long startTime = System.currentTimeMillis();
         saveDefaultConfig();
-        final FileConfiguration config = getConfig();
+        final FileConfiguration config = pluginConfig.getFile(getDataFolder().getAbsolutePath(), "config.yml");
         final ConfigurationSection mainSettings = config.getConfigurationSection("main-settings");
         setupLogger(config);
         setupProxy(mainSettings);

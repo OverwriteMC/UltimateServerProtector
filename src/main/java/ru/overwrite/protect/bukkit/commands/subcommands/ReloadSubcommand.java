@@ -1,6 +1,7 @@
 package ru.overwrite.protect.bukkit.commands.subcommands;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import ru.overwrite.protect.bukkit.ServerProtectorManager;
 
 public class ReloadSubcommand extends AbstractSubCommand {
@@ -11,7 +12,8 @@ public class ReloadSubcommand extends AbstractSubCommand {
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
-        plugin.reloadConfigs();
+        FileConfiguration newConfig = pluginConfig.getFile(plugin.getDataFolder().getAbsolutePath(), "config.yml");
+        plugin.reloadConfigs(newConfig);
         sender.sendMessage(pluginConfig.getUspMessages().reloaded());
         return true;
     }

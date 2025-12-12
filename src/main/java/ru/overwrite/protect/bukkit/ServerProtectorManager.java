@@ -15,6 +15,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.Messenger;
 import org.bukkit.potion.PotionEffect;
+import org.jetbrains.annotations.NotNull;
 import ru.overwrite.protect.bukkit.api.CaptureReason;
 import ru.overwrite.protect.bukkit.api.ServerProtectorAPI;
 import ru.overwrite.protect.bukkit.commands.PasCommand;
@@ -62,11 +63,13 @@ public class ServerProtectorManager extends JavaPlugin {
 
     private FileConfiguration messageFile;
 
+    private FileConfiguration config;
     @Setter
     private FileConfiguration dataFile;
     private String dataFileName;
     private String dataFilePath;
-    private final Config pluginConfig = new Config(this);
+
+    protected final Config pluginConfig = new Config(this);
     private final ServerProtectorAPI api = new ServerProtectorAPI(this);
     private final PasswordHandler passwordHandler = new PasswordHandler(this);
     private final Runner runner = Utils.FOLIA ? new PaperRunner(this) : new BukkitRunner(this);
@@ -135,6 +138,7 @@ public class ServerProtectorManager extends JavaPlugin {
     }
 
     protected void loadConfigs(FileConfiguration config) {
+        this.config = config;
         Utils.setupColorizer(config.getConfigurationSection("main-settings"));
         final ConfigurationSection fileSettings = config.getConfigurationSection("file-settings");
         boolean fullPath = fileSettings.getBoolean("use-full-path", false);
@@ -149,10 +153,9 @@ public class ServerProtectorManager extends JavaPlugin {
         pluginConfig.setupPasswords(dataFile);
     }
 
-    public void reloadConfigs() {
+    public void reloadConfigs(FileConfiguration config) {
         runner.runAsync(() -> {
-            reloadConfig();
-            final FileConfiguration config = getConfig();
+            this.config = config;
             Utils.setupColorizer(config.getConfigurationSection("main-settings"));
             String absolutePath = getDataFolder().getAbsolutePath();
             messageFile = pluginConfig.getFile(absolutePath, "message.yml");
@@ -167,23 +170,22 @@ public class ServerProtectorManager extends JavaPlugin {
     }
 
     private void setupPluginConfig(FileConfiguration config) {
-        pluginConfig.loadAccessData(config);
         pluginConfig.setupExcluded(config);
-        final FileConfiguration configFile = pluginConfig.getFile(dataFilePath, "config.yml");
-        pluginConfig.loadMainSettings(config, configFile);
-        pluginConfig.loadEncryptionSettings(config, configFile);
-        pluginConfig.loadSecureSettings(config, configFile);
-        pluginConfig.loadApiSettings(config, configFile);
-        pluginConfig.loadGeyserSettings(config, configFile);
-        pluginConfig.loadAdditionalChecks(config, configFile);
-        pluginConfig.loadPunishSettings(config, configFile);
-        pluginConfig.loadSessionSettings(config, configFile);
-        pluginConfig.loadMessageSettings(config, configFile);
-        pluginConfig.loadBossbarSettings(config, configFile);
-        pluginConfig.loadSoundSettings(config, configFile);
-        pluginConfig.loadEffects(config, configFile);
-        pluginConfig.loadLoggingSettings(config, configFile);
-        pluginConfig.loadFailCommands(config, configFile);
+        pluginConfig.loadMainSettings(config);
+        pluginConfig.loadEncryptionSettings(config);
+        pluginConfig.loadSecureSettings(config);
+        pluginConfig.loadAccessData(config);
+        pluginConfig.loadApiSettings(config);
+        pluginConfig.loadGeyserSettings(config);
+        pluginConfig.loadAdditionalChecks(config);
+        pluginConfig.loadPunishSettings(config);
+        pluginConfig.loadSessionSettings(config);
+        pluginConfig.loadMessageSettings(config);
+        pluginConfig.loadBossbarSettings(config);
+        pluginConfig.loadSoundSettings(config);
+        pluginConfig.loadEffects(config);
+        pluginConfig.loadLoggingSettings(config);
+        pluginConfig.loadFailCommands(config);
         pluginConfig.loadMsgMessages(messageFile);
         pluginConfig.loadUspMessages(messageFile);
         pluginConfig.loadLogFormats(messageFile);
@@ -305,8 +307,9 @@ public class ServerProtectorManager extends JavaPlugin {
 
     public void giveEffects(Player player) {
         runner.runPlayer(() -> {
-            if (!player.getActivePotionEffects().isEmpty()) {
-                oldEffects.put(player.getName(), player.getActivePotionEffects());
+            Collection<PotionEffect> effects = player.getActivePotionEffects();
+            if (!effects.isEmpty()) {
+                oldEffects.put(player.getName(), effects);
             }
             player.addPotionEffects(pluginConfig.getEffectSettings().effects());
         }, player);
@@ -320,11 +323,10 @@ public class ServerProtectorManager extends JavaPlugin {
             if (oldEffects.isEmpty()) {
                 return;
             }
-            Collection<PotionEffect> effects = oldEffects.get(player.getName());
+            Collection<PotionEffect> effects = oldEffects.remove(player.getName());
             if (effects != null) {
                 player.addPotionEffects(effects);
             }
-            oldEffects.remove(player.getName());
         }, player);
     }
 
@@ -436,5 +438,16 @@ public class ServerProtectorManager extends JavaPlugin {
         }
         pluginLogger.warn("Found illegal method call from " + className);
         return false;
+    }
+
+    @NotNull
+    @Override
+    public FileConfiguration getConfig() {
+        return this.config;
+    }
+
+    @Override
+    public void saveConfig() {
+        pluginConfig.save(getDataFolder().getAbsolutePath(), this.config, "config.yml", true);
     }
 }
