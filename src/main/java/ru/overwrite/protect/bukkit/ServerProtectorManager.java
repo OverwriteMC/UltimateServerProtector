@@ -426,11 +426,13 @@ public class ServerProtectorManager extends JavaPlugin {
     public boolean isCalledFromAllowedApplication() {
         StackWalker walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
 
-        List<Class<?>> callStack = walker.walk(frames ->
-                frames.map(StackWalker.StackFrame::getDeclaringClass)
-                        .collect(Collectors.toList())
+        Class<?> callingClass = walker.walk(frames -> frames
+                .skip(2)
+                .findFirst()
+                .map(StackWalker.StackFrame::getDeclaringClass)
+                .orElse(null)
         );
-        String className = callStack.get(2).getName();
+        String className = callingClass.getName();
 
         if (className.startsWith("ru.overwrite.protect.bukkit")) {
             return true;
