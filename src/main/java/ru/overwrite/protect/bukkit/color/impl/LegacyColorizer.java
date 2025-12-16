@@ -44,7 +44,7 @@ public class LegacyColorizer implements Colorizer {
             return message;
         }
 
-        final char[] d = new char[len * 3];
+        final char[] d = new char[len * 2];
         int w = 0;
         int i = 0;
 
