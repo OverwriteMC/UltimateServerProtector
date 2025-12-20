@@ -240,8 +240,8 @@ public class ServerProtectorManager extends JavaPlugin {
                     Constructor<PluginCommand> constructor = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
                     constructor.setAccessible(true);
                     PluginCommand command = constructor.newInstance(mainSettings.getString("pas-command", "pas"), this);
-                    command.setExecutor(new PasCommand(this));
                     commandMap.register(getDescription().getName(), command);
+                    command.setExecutor(new PasCommand(this));
                 } catch (Exception ex) {
                     pluginLogger.info("Unable to register password command! " + ex.getMessage());
                     pluginManager.disablePlugin(this);
