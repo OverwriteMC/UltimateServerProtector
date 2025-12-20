@@ -88,7 +88,10 @@ public class ServerProtectorManager extends JavaPlugin {
     protected void setupRunner(PluginManager pluginManager) {
         Plugin plugin = this;
         if (paper && pluginConfig.getSecureSettings().useFakePlugin()) {
-            plugin = FakePlugin.createFakePlugin();
+            Plugin fakePlugin = FakePlugin.createFakePlugin();
+            if (fakePlugin != null) {
+                plugin = fakePlugin;
+            }
             pluginManager.enablePlugin(plugin);
         }
         runner = Utils.FOLIA ? new PaperRunner(this, plugin) : new BukkitRunner(this, plugin);
@@ -217,6 +220,7 @@ public class ServerProtectorManager extends JavaPlugin {
             if (fakePlugin != null) {
                 plugin = fakePlugin;
             }
+            pluginManager.enablePlugin(plugin);
         }
         pluginManager.registerEvents(new ChatListener(this), plugin);
         pluginManager.registerEvents(new ConnectionListener(this), plugin);
