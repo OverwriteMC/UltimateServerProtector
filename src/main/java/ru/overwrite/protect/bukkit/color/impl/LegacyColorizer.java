@@ -90,6 +90,32 @@ public class LegacyColorizer implements Colorizer {
                 }
             }
 
+            if (remaining >= 14 && (s[i + 1] == 'x' || s[i + 1] == 'X')) {
+                boolean isHex = true;
+                for (int k = 0; k < 6; k++) {
+                    if (s[i + 2 + (k * 2)] != ALT_COLOR_CHAR) {
+                        isHex = false;
+                        break;
+                    }
+                    char hexChar = s[i + 3 + (k * 2)];
+                    if (hexChar >= 128 || !HEX[hexChar]) {
+                        isHex = false;
+                        break;
+                    }
+                }
+
+                if (isHex) {
+                    d[w++] = COLOR_CHAR;
+                    d[w++] = 'x';
+                    for (int k = 0; k < 6; k++) {
+                        d[w++] = COLOR_CHAR;
+                        d[w++] = s[i + 3 + (k * 2)];
+                    }
+                    i += 14;
+                    continue;
+                }
+            }
+
             if (remaining >= 2) {
                 final char next = s[i + 1];
                 if (next < 128 && COLOR[next]) {
