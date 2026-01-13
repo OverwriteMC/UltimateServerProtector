@@ -6,6 +6,8 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.jetbrains.annotations.NotNull;
 import ru.overwrite.protect.bukkit.ServerProtectorManager;
 import ru.overwrite.protect.bukkit.task.runner.Runner;
+import ru.overwrite.protect.bukkit.task.task.Task;
+import ru.overwrite.protect.bukkit.task.task.impl.BukkitTask;
 
 @SuppressWarnings("deprecation")
 public final class BukkitRunner implements Runner {
@@ -21,38 +23,38 @@ public final class BukkitRunner implements Runner {
     }
 
     @Override
-    public void runPlayer(@NotNull Runnable task, @NotNull Player player) {
-        run(task);
+    public Task runPlayer(@NotNull Runnable task, @NotNull Player player) {
+        return new BukkitTask(scheduler.runTask(taskOwner, task));
     }
 
     @Override
-    public void run(@NotNull Runnable task) {
-        scheduler.runTask(taskOwner, task);
+    public Task run(@NotNull Runnable task) {
+        return new BukkitTask(scheduler.runTask(taskOwner, task));
     }
 
     @Override
-    public void runAsync(@NotNull Runnable task) {
-        scheduler.runTaskAsynchronously(taskOwner, task);
+    public Task runAsync(@NotNull Runnable task) {
+        return new BukkitTask(scheduler.runTaskAsynchronously(taskOwner, task));
     }
 
     @Override
-    public void runDelayed(@NotNull Runnable task, long delayTicks) {
-        scheduler.runTaskLater(taskOwner, task, delayTicks);
+    public Task runDelayed(@NotNull Runnable task, long delayTicks) {
+        return new BukkitTask(scheduler.runTaskLater(taskOwner, task, delayTicks));
     }
 
     @Override
-    public void runDelayedAsync(@NotNull Runnable task, long delayTicks) {
-        scheduler.runTaskLaterAsynchronously(taskOwner, task, delayTicks);
+    public Task runDelayedAsync(@NotNull Runnable task, long delayTicks) {
+        return new BukkitTask(scheduler.runTaskLaterAsynchronously(taskOwner, task, delayTicks));
     }
 
     @Override
-    public void runPeriodical(@NotNull Runnable task, long delayTicks, long periodTicks) {
-        scheduler.runTaskTimer(taskOwner, task, delayTicks, periodTicks);
+    public Task runPeriodical(@NotNull Runnable task, long delayTicks, long periodTicks) {
+        return new BukkitTask(scheduler.runTaskTimer(taskOwner, task, delayTicks, periodTicks));
     }
 
     @Override
-    public void runPeriodicalAsync(@NotNull Runnable task, long delayTicks, long periodTicks) {
-        scheduler.runTaskTimerAsynchronously(taskOwner, task, delayTicks, periodTicks);
+    public Task runPeriodicalAsync(@NotNull Runnable task, long delayTicks, long periodTicks) {
+        return new BukkitTask(scheduler.runTaskTimerAsynchronously(taskOwner, task, delayTicks, periodTicks));
     }
 
     @Override

@@ -2,22 +2,23 @@ package ru.overwrite.protect.bukkit.task.runner;
 
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import ru.overwrite.protect.bukkit.task.task.Task;
 
 public interface Runner {
 
-    void runPlayer(@NotNull Runnable task, @NotNull Player player);
+    Task runPlayer(@NotNull Runnable task, @NotNull Player player);
 
-    void run(@NotNull Runnable task);
+    Task run(@NotNull Runnable task);
 
-    void runAsync(@NotNull Runnable task);
+    Task runAsync(@NotNull Runnable task);
 
-    void runDelayed(@NotNull Runnable task, long delayTicks);
+    Task runDelayed(@NotNull Runnable task, long delayTicks);
 
-    void runDelayedAsync(@NotNull Runnable task, long delayTicks);
+    Task runDelayedAsync(@NotNull Runnable task, long delayTicks);
 
-    void runPeriodical(@NotNull Runnable task, long delayTicks, long periodTicks);
+    Task runPeriodical(@NotNull Runnable task, long delayTicks, long periodTicks);
 
-    void runPeriodicalAsync(@NotNull Runnable task, long delayTicks, long periodTicks);
+    Task runPeriodicalAsync(@NotNull Runnable task, long delayTicks, long periodTicks);
 
     void cancelTasks();
 }

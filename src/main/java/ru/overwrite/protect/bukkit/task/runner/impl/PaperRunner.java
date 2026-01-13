@@ -8,6 +8,8 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import ru.overwrite.protect.bukkit.ServerProtectorManager;
 import ru.overwrite.protect.bukkit.task.runner.Runner;
+import ru.overwrite.protect.bukkit.task.task.Task;
+import ru.overwrite.protect.bukkit.task.task.impl.PaperTask;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -27,38 +29,38 @@ public final class PaperRunner implements Runner {
     }
 
     @Override
-    public void runPlayer(@NotNull Runnable task, @NotNull Player player) {
-        player.getScheduler().run(taskOwner, toConsumer(task), null);
+    public Task runPlayer(@NotNull Runnable task, @NotNull Player player) {
+        return new PaperTask(player.getScheduler().run(taskOwner, toConsumer(task), null));
     }
 
     @Override
-    public void run(@NotNull Runnable task) {
-        globalScheduler.run(taskOwner, toConsumer(task));
+    public Task run(@NotNull Runnable task) {
+        return new PaperTask(globalScheduler.run(taskOwner, toConsumer(task)));
     }
 
     @Override
-    public void runAsync(@NotNull Runnable task) {
-        asyncScheduler.runNow(taskOwner, toConsumer(task));
+    public Task runAsync(@NotNull Runnable task) {
+        return new PaperTask(asyncScheduler.runNow(taskOwner, toConsumer(task)));
     }
 
     @Override
-    public void runDelayed(@NotNull Runnable task, long delayTicks) {
-        globalScheduler.runDelayed(taskOwner, toConsumer(task), delayTicks);
+    public Task runDelayed(@NotNull Runnable task, long delayTicks) {
+        return new PaperTask(globalScheduler.runDelayed(taskOwner, toConsumer(task), delayTicks));
     }
 
     @Override
-    public void runDelayedAsync(@NotNull Runnable task, long delayTicks) {
-        asyncScheduler.runDelayed(taskOwner, toConsumer(task), toMilli(delayTicks), TimeUnit.MILLISECONDS);
+    public Task runDelayedAsync(@NotNull Runnable task, long delayTicks) {
+        return new PaperTask(asyncScheduler.runDelayed(taskOwner, toConsumer(task), toMilli(delayTicks), TimeUnit.MILLISECONDS));
     }
 
     @Override
-    public void runPeriodical(@NotNull Runnable task, long delayTicks, long periodTicks) {
-        globalScheduler.runAtFixedRate(taskOwner, toConsumer(task), delayTicks, periodTicks);
+    public Task runPeriodical(@NotNull Runnable task, long delayTicks, long periodTicks) {
+        return new PaperTask(globalScheduler.runAtFixedRate(taskOwner, toConsumer(task), delayTicks, periodTicks));
     }
 
     @Override
-    public void runPeriodicalAsync(@NotNull Runnable task, long delayTicks, long periodTicks) {
-        asyncScheduler.runAtFixedRate(taskOwner, toConsumer(task), toMilli(delayTicks), toMilli(periodTicks), TimeUnit.MILLISECONDS);
+    public Task runPeriodicalAsync(@NotNull Runnable task, long delayTicks, long periodTicks) {
+        return new PaperTask(asyncScheduler.runAtFixedRate(taskOwner, toConsumer(task), toMilli(delayTicks), toMilli(periodTicks), TimeUnit.MILLISECONDS));
     }
 
     @Override
