@@ -40,9 +40,8 @@ public final class PasswordHandler {
 
     public void checkPassword(Player player, String input, boolean resync) {
         Runnable run = () -> {
-            ServerProtectorPasswordEnterEvent enterEvent = new ServerProtectorPasswordEnterEvent(player, input);
-            RegisteredListener[] listeners = enterEvent.getHandlers().getRegisteredListeners();
-            if (pluginConfig.getApiSettings().callEventOnPasswordEnter() && listeners.length != 0 && !enterEvent.callEvent()) {
+            RegisteredListener[] listeners = ServerProtectorPasswordEnterEvent.getHandlerList().getRegisteredListeners();
+            if (pluginConfig.getApiSettings().callEventOnPasswordEnter() && listeners.length != 0 && !new ServerProtectorPasswordEnterEvent(player, input).callEvent()) {
                 return;
             }
             String playerPass = pluginConfig.getPerPlayerPasswords().get(player.getName());
@@ -95,10 +94,12 @@ public final class PasswordHandler {
         if (pluginConfig.getPunishSettings().enableAttempts()) {
             attempts.addTo(playerName, 1);
         }
-        ServerProtectorPasswordFailEvent failEvent = new ServerProtectorPasswordFailEvent(player, attempts.getInt(playerName));
-        RegisteredListener[] listeners = failEvent.getHandlers().getRegisteredListeners();
-        if (listeners.length != 0 && !failEvent.callEvent()) {
-            return;
+        RegisteredListener[] failListeners = ServerProtectorPasswordFailEvent.getHandlerList().getRegisteredListeners();
+        if (failListeners.length != 0) {
+            ServerProtectorPasswordFailEvent failEvent = new ServerProtectorPasswordFailEvent(player, attempts.getInt(playerName));
+            if (!failEvent.callEvent()) {
+                return;
+            }
         }
         player.sendMessage(pluginConfig.getMessages().incorrect());
         if (pluginConfig.getMessageSettings().sendTitle()) {
@@ -119,10 +120,12 @@ public final class PasswordHandler {
         if (!plugin.isCalledFromAllowedApplication()) {
             return;
         }
-        ServerProtectorPasswordSuccessEvent successEvent = new ServerProtectorPasswordSuccessEvent(player);
-        RegisteredListener[] listeners = successEvent.getHandlers().getRegisteredListeners();
-        if (listeners.length != 0 && !successEvent.callEvent()) {
-            return;
+        RegisteredListener[] successListeners = ServerProtectorPasswordSuccessEvent.getHandlerList().getRegisteredListeners();
+        if (successListeners.length != 0) {
+            ServerProtectorPasswordSuccessEvent successEvent = new ServerProtectorPasswordSuccessEvent(player);
+            if (!successEvent.callEvent()) {
+                return;
+            }
         }
         String playerName = player.getName();
         api.uncapturePlayer(playerName);
