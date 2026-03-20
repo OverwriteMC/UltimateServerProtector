@@ -19,7 +19,7 @@ main-settings:
   # Check for updates (advised not to disable)
   update-checker: true
   # Main check interval in ticks (do not touch if you don't know how it works)
-  check-interval: 40
+  check-interval: 30
   # Should PlaceholderAPI be supported in plugin messages?
   # Applies only to messages involving a player
   papi-support: false

@@ -75,7 +75,7 @@ public final class TaskManager {
                     }
                 }
             }
-        }, 20L, interval >= 0 ? interval : 40L);
+        }, 20L, interval >= 0 ? interval : 30L);
     }
 
     public void startAdminCheck() {
