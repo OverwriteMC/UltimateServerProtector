@@ -96,8 +96,7 @@ public final class PasswordHandler {
         }
         RegisteredListener[] failListeners = ServerProtectorPasswordFailEvent.getHandlerList().getRegisteredListeners();
         if (failListeners.length != 0) {
-            ServerProtectorPasswordFailEvent failEvent = new ServerProtectorPasswordFailEvent(player, attempts.getInt(playerName));
-            if (!failEvent.callEvent()) {
+            if (!new ServerProtectorPasswordFailEvent(player, attempts.getInt(playerName)).callEvent()) {
                 return;
             }
         }
@@ -122,8 +121,7 @@ public final class PasswordHandler {
         }
         RegisteredListener[] successListeners = ServerProtectorPasswordSuccessEvent.getHandlerList().getRegisteredListeners();
         if (successListeners.length != 0) {
-            ServerProtectorPasswordSuccessEvent successEvent = new ServerProtectorPasswordSuccessEvent(player);
-            if (!successEvent.callEvent()) {
+            if (!new ServerProtectorPasswordSuccessEvent(player).callEvent()) {
                 return;
             }
         }
