@@ -265,6 +265,8 @@ permissions:
   - 'citizens.*'
   - 'citizenscmd.*'
   - 'znpcs.*'
+  - 'znpcsplus.command.npc'
+  - 'fancynpcs.*'
   - 'holograms.*'
   - 'multiverse.*'
   - 'coreprotect.*'
@@ -274,6 +276,7 @@ permissions:
   - 'vulcan.*'
   - 'grim.*'
   - 'dh.admin'
+  - 'fancyholograms.admin'
   - 'ls.admin'
   - 'fawe.admin'
   - 'authme.admin'
@@ -284,7 +287,6 @@ permissions:
   - 'plugman.*'
   - 'plugman.admin'
   - 'plugman.download'
-  - 'serverprotector.admin'
 
 # Права, которые никто, кроме игроков из раздела excluded-players, не сможет иметь (отключено по умолчанию.)
 blacklisted-perms:
