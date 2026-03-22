@@ -14,7 +14,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.Messenger;
-import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.NotNull;
 import ru.overwrite.protect.bukkit.api.CaptureReason;
 import ru.overwrite.protect.bukkit.api.ServerProtectorAPI;
@@ -22,7 +21,6 @@ import ru.overwrite.protect.bukkit.color.ColorizerProvider;
 import ru.overwrite.protect.bukkit.commands.PasCommand;
 import ru.overwrite.protect.bukkit.commands.UspCommand;
 import ru.overwrite.protect.bukkit.configuration.Config;
-import ru.overwrite.protect.bukkit.configuration.data.BlockingSettings;
 import ru.overwrite.protect.bukkit.configuration.data.SecureSettings;
 import ru.overwrite.protect.bukkit.configuration.data.SystemMessages;
 import ru.overwrite.protect.bukkit.listeners.*;
@@ -45,10 +43,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collection;
-import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
 
 @Getter
 public class ServerProtectorManager extends JavaPlugin {
@@ -71,7 +66,8 @@ public class ServerProtectorManager extends JavaPlugin {
 
     protected final Config pluginConfig = new Config(this);
     private final ServerProtectorAPI api = new ServerProtectorAPI(this);
-    private final PasswordHandler passwordHandler = new PasswordHandler(this);
+    private PasswordHandler passwordHandler;
+    private PlayerManager playerManager;
     private Runner runner;
 
     private PluginMessage pluginMessage;
@@ -261,6 +257,8 @@ public class ServerProtectorManager extends JavaPlugin {
     }
 
     public void startTasks(FileConfiguration config) {
+        this.passwordHandler = new PasswordHandler(this);
+        this.playerManager = new PlayerManager(this);
         TaskManager taskManager = new TaskManager(this);
         taskManager.startMainCheck(pluginConfig.getMainSettings().checkInterval());
         taskManager.startCapturesMessages(config);
@@ -313,51 +311,6 @@ public class ServerProtectorManager extends JavaPlugin {
                 }
             }
         });
-    }
-
-    @Getter(AccessLevel.NONE)
-    private final Map<String, Collection<PotionEffect>> oldEffects = new IdentityHashMap<>();
-
-    public void giveEffects(Player player) {
-        runner.runPlayer(() -> {
-            Collection<PotionEffect> effects = player.getActivePotionEffects();
-            if (!effects.isEmpty()) {
-                oldEffects.put(player.getName(), effects);
-            }
-            player.addPotionEffects(pluginConfig.getEffectSettings().effects());
-        }, player);
-    }
-
-    public void removeEffects(Player player) {
-        runner.runPlayer(() -> {
-            for (PotionEffect effect : player.getActivePotionEffects()) { // Old versions compatibility
-                player.removePotionEffect(effect.getType());
-            }
-            if (oldEffects.isEmpty()) {
-                return;
-            }
-            Collection<PotionEffect> effects = oldEffects.remove(player.getName());
-            if (effects != null) {
-                player.addPotionEffects(effects);
-            }
-        }, player);
-    }
-
-    public void applyHide(Player player) {
-        runner.runPlayer(() -> {
-            BlockingSettings blockingSettings = pluginConfig.getBlockingSettings();
-            if (!blockingSettings.hideOnEntering() && !blockingSettings.hideOtherOnEntering()) {
-                return;
-            }
-            for (Player onlinePlayer : server.getOnlinePlayers()) {
-                if (blockingSettings.hideOnEntering()) {
-                    onlinePlayer.hidePlayer(this, player);
-                }
-                if (blockingSettings.hideOtherOnEntering()) {
-                    player.hidePlayer(this, onlinePlayer);
-                }
-            }
-        }, player);
     }
 
     protected void logEnableDisable(String msg, LocalDateTime date) {

@@ -7,6 +7,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
 import org.bukkit.plugin.RegisteredListener;
 import ru.overwrite.protect.bukkit.PasswordHandler;
+import ru.overwrite.protect.bukkit.PlayerManager;
 import ru.overwrite.protect.bukkit.ServerProtectorManager;
 import ru.overwrite.protect.bukkit.api.CaptureReason;
 import ru.overwrite.protect.bukkit.api.ServerProtectorAPI;
@@ -22,14 +23,15 @@ public class ConnectionListener implements Listener {
     private final ServerProtectorManager plugin;
     private final ServerProtectorAPI api;
     private final PasswordHandler passwordHandler;
+    private final PlayerManager playerManager;
     private final Config pluginConfig;
-
     private final Runner runner;
 
     public ConnectionListener(ServerProtectorManager plugin) {
         this.plugin = plugin;
         this.api = plugin.getApi();
         this.passwordHandler = plugin.getPasswordHandler();
+        this.playerManager = plugin.getPlayerManager();
         this.pluginConfig = plugin.getPluginConfig();
         this.runner = plugin.getRunner();
     }
@@ -89,9 +91,9 @@ public class ConnectionListener implements Listener {
             }
             if (api.isCaptured(player)) {
                 if (pluginConfig.getEffectSettings().enableEffects()) {
-                    plugin.giveEffects(player);
+                    playerManager.giveEffects(player);
                 }
-                plugin.applyHide(player);
+                playerManager.applyHide(player);
             }
             if (pluginConfig.getLoggingSettings().loggingJoin()) {
                 plugin.logAction(pluginConfig.getLogMessages().joined(), player, LocalDateTime.now());
@@ -151,11 +153,11 @@ public class ConnectionListener implements Listener {
     private void handlePlayerLeave(Player player) {
         String playerName = player.getName();
         if (api.isCaptured(player)) {
-            plugin.removeEffects(player);
+            playerManager.removeEffects(player);
             if (pluginConfig.getPunishSettings().enableRejoin()) {
                 handleRejoin(playerName);
             }
-            passwordHandler.getBossbars().remove(player.getName());
+            playerManager.removeBossBar(player.getName());
         }
         plugin.getPerPlayerTime().removeInt(playerName);
         api.unsavePlayer(playerName);

@@ -2,11 +2,10 @@ package ru.overwrite.protect.bukkit.task;
 
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.bukkit.Bukkit;
-import org.bukkit.boss.BossBar;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredListener;
-import ru.overwrite.protect.bukkit.PasswordHandler;
+import ru.overwrite.protect.bukkit.PlayerManager;
 import ru.overwrite.protect.bukkit.ServerProtectorManager;
 import ru.overwrite.protect.bukkit.api.CaptureReason;
 import ru.overwrite.protect.bukkit.api.ServerProtectorAPI;
@@ -22,14 +21,14 @@ public final class TaskManager {
 
     private final ServerProtectorManager plugin;
     private final ServerProtectorAPI api;
-    private final PasswordHandler passwordHandler;
+    private final PlayerManager playerManager;
     private final Config pluginConfig;
     private final Runner runner;
 
     public TaskManager(ServerProtectorManager plugin) {
         this.plugin = plugin;
         this.api = plugin.getApi();
-        this.passwordHandler = plugin.getPasswordHandler();
+        this.playerManager = plugin.getPlayerManager();
         this.pluginConfig = plugin.getPluginConfig();
         this.runner = plugin.getRunner();
     }
@@ -64,9 +63,9 @@ public final class TaskManager {
                         Utils.sendSound(pluginConfig.getSoundSettings().onCapture(), onlinePlayer);
                     }
                     if (pluginConfig.getEffectSettings().enableEffects()) {
-                        plugin.giveEffects(onlinePlayer);
+                        playerManager.giveEffects(onlinePlayer);
                     }
-                    plugin.applyHide(onlinePlayer);
+                    playerManager.applyHide(onlinePlayer);
                     if (pluginConfig.getLoggingSettings().loggingPas()) {
                         plugin.logAction(pluginConfig.getLogMessages().captured(), onlinePlayer, LocalDateTime.now());
                     }
@@ -152,32 +151,13 @@ public final class TaskManager {
                 String playerName = onlinePlayer.getName();
                 Object2IntOpenHashMap<String> perPlayerTime = plugin.getPerPlayerTime();
                 int newTime = perPlayerTime.addTo(playerName, 1);
-                BossBar bossBar = null;
                 if (bossbarSettings.enableBossbar()) {
-                    bossBar = passwordHandler.getBossbars().get(playerName);
-                    if (bossBar == null) {
-                        bossBar = Bukkit.createBossBar(
-                                bossbarSettings.bossbarMessage().replace("%time%", Integer.toString(time)),
-                                bossbarSettings.barColor(),
-                                bossbarSettings.barStyle()
-                        );
-                        passwordHandler.getBossbars().put(playerName, bossBar);
-                    }
-
                     int remaining = time - newTime;
-                    bossBar.setTitle(bossbarSettings.bossbarMessage().replace("%time%", Integer.toString(remaining)));
-
-                    double percents = remaining / (double) time;
-                    if (percents > 0) {
-                        bossBar.setProgress(percents);
-                        bossBar.addPlayer(onlinePlayer);
-                    }
+                    playerManager.updateBossBar(onlinePlayer, remaining, time);
                 }
                 if (time - newTime <= 0) {
                     plugin.checkFail(playerName, pluginConfig.getCommands().failedTime());
-                    if (bossBar != null) {
-                        bossBar.removePlayer(onlinePlayer);
-                    }
+                    playerManager.removeBossBar(playerName);
                     perPlayerTime.removeInt(playerName);
                 }
             }

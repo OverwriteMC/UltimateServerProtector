@@ -2,8 +2,6 @@ package ru.overwrite.protect.bukkit;
 
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import lombok.Getter;
-import org.bukkit.Bukkit;
-import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredListener;
 import ru.overwrite.protect.bukkit.api.ServerProtectorAPI;
@@ -11,31 +9,27 @@ import ru.overwrite.protect.bukkit.api.events.ServerProtectorPasswordEnterEvent;
 import ru.overwrite.protect.bukkit.api.events.ServerProtectorPasswordFailEvent;
 import ru.overwrite.protect.bukkit.api.events.ServerProtectorPasswordSuccessEvent;
 import ru.overwrite.protect.bukkit.configuration.Config;
-import ru.overwrite.protect.bukkit.configuration.data.BlockingSettings;
 import ru.overwrite.protect.bukkit.configuration.data.EncryptionSettings;
 import ru.overwrite.protect.bukkit.utils.Utils;
 
 import java.time.LocalDateTime;
-import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
 
 public final class PasswordHandler {
 
     private final ServerProtectorManager plugin;
     private final ServerProtectorAPI api;
+    private final PlayerManager playerManager;
     private final Config pluginConfig;
 
     @Getter
     private final Object2IntOpenHashMap<String> attempts = new Object2IntOpenHashMap<>();
 
-    @Getter
-    private final Map<String, BossBar> bossbars = new IdentityHashMap<>();
-
     public PasswordHandler(ServerProtectorManager plugin) {
         this.plugin = plugin;
-        this.pluginConfig = plugin.getPluginConfig();
         this.api = plugin.getApi();
+        this.playerManager = plugin.getPlayerManager();
+        this.pluginConfig = plugin.getPluginConfig();
     }
 
     public void checkPassword(Player player, String input, boolean resync) {
@@ -137,9 +131,9 @@ public final class PasswordHandler {
             Utils.sendSound(pluginConfig.getSoundSettings().onPasCorrect(), player);
         }
         if (pluginConfig.getEffectSettings().enableEffects()) {
-            plugin.removeEffects(player);
+            playerManager.removeEffects(player);
         }
-        this.showPlayer(player);
+        playerManager.showPlayer(player);
         api.authorisePlayer(player);
         if (pluginConfig.getSessionSettings().sessionTimeEnabled()) {
             plugin.getRunner().runDelayedAsync(() -> {
@@ -151,28 +145,11 @@ public final class PasswordHandler {
         if (pluginConfig.getLoggingSettings().loggingPas()) {
             plugin.logAction(pluginConfig.getLogMessages().passed(), player, LocalDateTime.now());
         }
-        BossBar playerBossBar;
-        if (pluginConfig.getBossbarSettings().enableBossbar() && (playerBossBar = bossbars.get(playerName)) != null) {
-            playerBossBar.removeAll();
-            bossbars.remove(playerName);
+        if (pluginConfig.getBossbarSettings().enableBossbar()) {
+            playerManager.removeBossBar(playerName);
         }
         if (pluginConfig.getBroadcasts() != null) {
             plugin.sendAlert(player, pluginConfig.getBroadcasts().passed());
-        }
-    }
-
-    private void showPlayer(Player player) {
-        BlockingSettings blockingSettings = pluginConfig.getBlockingSettings();
-        if (!blockingSettings.hideOnEntering() && !blockingSettings.hideOtherOnEntering()) {
-            return;
-        }
-        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            if (blockingSettings.hideOnEntering()) {
-                onlinePlayer.showPlayer(plugin, player);
-            }
-            if (blockingSettings.hideOtherOnEntering()) {
-                player.showPlayer(plugin, onlinePlayer);
-            }
         }
     }
 }
