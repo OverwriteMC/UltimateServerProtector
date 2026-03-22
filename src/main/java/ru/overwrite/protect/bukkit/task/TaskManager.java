@@ -88,7 +88,7 @@ public final class TaskManager {
                     plugin.checkFail(onlinePlayer.getName(), pluginConfig.getCommands().notInConfig());
                 }
             }
-        }, 5L, 20L);
+        }, 5L, 15L);
     }
 
     public void startCapturesMessages(FileConfiguration config) {
@@ -119,7 +119,7 @@ public final class TaskManager {
                     plugin.checkFail(onlinePlayer.getName(), pluginConfig.getCommands().notInOpWhitelist());
                 }
             }
-        }, 5L, 20L);
+        }, 5L, 15L);
     }
 
     public void startPermsCheck() {
@@ -135,7 +135,7 @@ public final class TaskManager {
                     }
                 }
             }
-        }, 5L, 20L);
+        }, 5L, 15L);
     }
 
     public void startCapturesTimer() {
@@ -181,6 +181,6 @@ public final class TaskManager {
                     perPlayerTime.removeInt(playerName);
                 }
             }
-        }, 5L, 20L);
+        }, 5L, 15L);
     }
 }
