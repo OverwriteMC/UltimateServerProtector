@@ -40,11 +40,11 @@ public final class ServerProtector extends ServerProtectorManager {
     public void onDisable() {
         if (getMessageFile() != null) {
             logEnableDisable(getPluginConfig().getLogMessages().disabled(), LocalDateTime.now());
-        }
-        if (getPluginConfig().getMessageSettings().enableBroadcasts()) {
-            for (Player onlinePlayer : server.getOnlinePlayers()) {
-                if (onlinePlayer.hasPermission("serverprotector.admin") && getMessageFile() != null) {
-                    onlinePlayer.sendMessage(getPluginConfig().getBroadcasts().disabled());
+            if (getPluginConfig().getMessageSettings().enableBroadcasts()) {
+                for (Player onlinePlayer : server.getOnlinePlayers()) {
+                    if (onlinePlayer.hasPermission("serverprotector.admin")) {
+                        onlinePlayer.sendMessage(getPluginConfig().getBroadcasts().disabled());
+                    }
                 }
             }
         }
