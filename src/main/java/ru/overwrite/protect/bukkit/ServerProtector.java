@@ -24,9 +24,9 @@ public final class ServerProtector extends ServerProtectorManager {
         setupRunner(pluginManager);
         checkSafe(pluginManager);
         checkPaper();
+        startTasks(config);
         registerListeners(pluginManager);
         registerCommands(pluginManager, mainSettings);
-        startTasks(config);
         logEnableDisable(getPluginConfig().getLogMessages().enabled(), LocalDateTime.now());
         if (mainSettings.getBoolean("enable-metrics", true)) {
             new Metrics(this, 13347);

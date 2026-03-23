@@ -257,8 +257,8 @@ public class ServerProtectorManager extends JavaPlugin {
     }
 
     public void startTasks(FileConfiguration config) {
-        this.passwordHandler = new PasswordHandler(this);
         this.playerManager = new PlayerManager(this);
+        this.passwordHandler = new PasswordHandler(this);
         TaskManager taskManager = new TaskManager(this);
         taskManager.startMainCheck(pluginConfig.getMainSettings().checkInterval());
         taskManager.startCapturesMessages(config);
