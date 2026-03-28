@@ -144,12 +144,6 @@ public class ConnectionListener implements Listener {
         handlePlayerLeave(player);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onKick(PlayerKickEvent event) {
-        Player player = event.getPlayer();
-        handlePlayerLeave(player);
-    }
-
     private void handlePlayerLeave(Player player) {
         String playerName = player.getName();
         if (api.isCaptured(player)) {
