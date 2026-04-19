@@ -80,30 +80,24 @@ public class ServerProtectorManager extends JavaPlugin {
     @Getter(AccessLevel.NONE)
     public final Server server = getServer();
 
-    protected void setupRunner(PluginManager pluginManager) {
-        Plugin plugin = this;
-        if (paper && pluginConfig.getSecureSettings().useFakePlugin()) {
-            Plugin fakePlugin = FakePlugin.createFakePlugin();
-            if (fakePlugin != null) {
-                plugin = fakePlugin;
-            }
-            pluginManager.enablePlugin(plugin);
-        }
+    protected void setupRunner(Plugin plugin) {
         runner = Utils.FOLIA ? new PaperRunner(this, plugin) : new BukkitRunner(this, plugin);
     }
 
-    protected void checkPaper() {
-        if (server.getName().equals("CraftBukkit")) {
-            SystemMessages systemMessages = pluginConfig.getSystemMessages();
-            runner.runPeriodical(() -> {
-                pluginLogger.info(systemMessages.baselineWarn());
-                pluginLogger.info(systemMessages.paper1());
-                pluginLogger.info(systemMessages.paper2());
-                pluginLogger.info(systemMessages.baselineWarn());
-            }, 0L, 20L * 1800);
-            return;
+    protected Plugin getRuntimePlugin(PluginManager pluginManager) {
+        if (!paper || !pluginConfig.getSecureSettings().useFakePlugin()) {
+            return this;
         }
-        this.paper = true;
+        Plugin fakePlugin = FakePlugin.createFakePlugin();
+        if (fakePlugin != null) {
+            pluginManager.enablePlugin(fakePlugin);
+            return fakePlugin;
+        }
+        return this;
+    }
+
+    protected void checkPaper() {
+        this.paper = !server.getName().equals("CraftBukkit");
     }
 
     private boolean safe;
@@ -208,15 +202,7 @@ public class ServerProtectorManager extends JavaPlugin {
         }
     }
 
-    protected void registerListeners(PluginManager pluginManager) {
-        Plugin plugin = this;
-        if (paper && pluginConfig.getSecureSettings().useFakePlugin()) {
-            Plugin fakePlugin = FakePlugin.createFakePlugin();
-            if (fakePlugin != null) {
-                plugin = fakePlugin;
-            }
-            pluginManager.enablePlugin(plugin);
-        }
+    protected void registerListeners(PluginManager pluginManager, Plugin plugin) {
         pluginManager.registerEvents(new ChatListener(this), plugin);
         pluginManager.registerEvents(new ConnectionListener(this), plugin);
         pluginManager.registerEvents(new MainListener(this), plugin);
@@ -274,6 +260,15 @@ public class ServerProtectorManager extends JavaPlugin {
         }
         if (secureSettings.enablePermissionBlacklist()) {
             taskManager.startPermsCheck();
+        }
+        if (!paper) {
+            SystemMessages systemMessages = pluginConfig.getSystemMessages();
+            runner.runPeriodical(() -> {
+                pluginLogger.info(systemMessages.baselineWarn());
+                pluginLogger.info(systemMessages.paper1());
+                pluginLogger.info(systemMessages.paper2());
+                pluginLogger.info(systemMessages.baselineWarn());
+            }, 0L, 20L * 1800);
         }
     }
 

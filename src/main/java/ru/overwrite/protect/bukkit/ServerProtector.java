@@ -4,6 +4,7 @@ import org.bstats.bukkit.Metrics;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.messaging.Messenger;
 
@@ -20,12 +21,13 @@ public final class ServerProtector extends ServerProtectorManager {
         setupLogger(config);
         setupProxy(mainSettings);
         loadConfigs(config);
-        PluginManager pluginManager = server.getPluginManager();
-        setupRunner(pluginManager);
-        checkSafe(pluginManager);
         checkPaper();
+        PluginManager pluginManager = server.getPluginManager();
+        Plugin runtimePlugin = getRuntimePlugin(pluginManager);
+        setupRunner(runtimePlugin);
+        checkSafe(pluginManager);
         startTasks(config);
-        registerListeners(pluginManager);
+        registerListeners(pluginManager, runtimePlugin);
         registerCommands(pluginManager, mainSettings);
         logEnableDisable(getPluginConfig().getLogMessages().enabled(), LocalDateTime.now());
         if (mainSettings.getBoolean("enable-metrics", true)) {
