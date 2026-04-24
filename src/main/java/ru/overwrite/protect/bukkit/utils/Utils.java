@@ -17,7 +17,6 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 
 @UtilityClass
@@ -84,9 +83,6 @@ public class Utils {
         }, 10);
     }
 
-    private final Set<String> SUPPORTED_HASH_TYPES =
-            Set.of("SHA224", "SHA256", "SHA384", "SHA512", "SHA-224", "SHA-256", "SHA-384", "SHA-512", "SHA3-224", "SHA3-256", "SHA3-384", "SHA3-512");
-
     public String encryptPassword(String password, String salt, List<String> hashTypes) {
         if (hashTypes.isEmpty()) {
             return password;
@@ -108,15 +104,15 @@ public class Utils {
                     break;
                 }
                 default: {
-                    if (SUPPORTED_HASH_TYPES.contains(hashType)) {
+                    try {
                         encryptedPassword = encryptToHash(encryptedPassword, hashType);
-                    } else {
+                    } catch (NoSuchAlgorithmException ex) {
                         throw new IllegalArgumentException("Unsupported hash type: " + hashType);
                     }
                 }
             }
         }
-        return salted ? salt + ":" + encryptedPassword : encryptedPassword;
+        return salted ? salt + ':' + encryptedPassword : encryptedPassword;
     }
 
     private final SecureRandom random = new SecureRandom();
@@ -147,15 +143,10 @@ public class Utils {
         return Base64.getEncoder().encodeToString(str.getBytes(StandardCharsets.UTF_8));
     }
 
-    private String encryptToHash(String str, String algorithm) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance(algorithm);
-            byte[] hash = digest.digest(str.getBytes(StandardCharsets.UTF_8));
-            return bytesToHexString(hash);
-        } catch (NoSuchAlgorithmException ex) {
-            ex.printStackTrace();
-            return str;
-        }
+    private String encryptToHash(String str, String algorithm) throws NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance(algorithm);
+        byte[] hash = digest.digest(str.getBytes(StandardCharsets.UTF_8));
+        return bytesToHexString(hash);
     }
 
     private final char[] HEX_CHARS = {
