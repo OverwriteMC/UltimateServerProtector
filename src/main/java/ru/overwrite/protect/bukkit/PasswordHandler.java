@@ -137,7 +137,7 @@ public final class PasswordHandler {
         api.authorisePlayer(player);
         if (pluginConfig.getSessionSettings().sessionTimeEnabled()) {
             plugin.getRunner().runDelayedAsync(() -> {
-                if (!api.isAuthorised(player)) {
+                if (api.isAuthorised(player)) {
                     api.deauthorisePlayer(player);
                 }
             }, pluginConfig.getSessionSettings().sessionTime() * 20L);
