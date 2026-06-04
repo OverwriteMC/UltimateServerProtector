@@ -68,7 +68,7 @@ public class ConnectionListener implements Listener {
                     }
                 }
             }
-            if (pluginConfig.getSessionSettings().session() && !api.hasSession(playerName, ip)) {
+            if (!pluginConfig.getSessionSettings().session() || !api.hasSession(playerName, ip)) {
                 if (!api.isExcluded(playerName, pluginConfig.getExcludedPlayers().adminPass())) {
                     RegisteredListener[] listeners = ServerProtectorCaptureEvent.getHandlerList().getRegisteredListeners();
                     if (listeners.length != 0) {
