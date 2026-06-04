@@ -83,4 +83,4 @@ system:
   update-success-2: "§aRestart the server to apply the update."
   update-outdated-1: "§aYou are using outdated version of the plugin!"
   update-outdated-2: "§aYou can download new version here:"
-  update-outdated-3: "§bgithub.com/Overwrite987/UltimateServerProtector/releases/"
+  update-outdated-3: "§bgithub.com/OverwriteMC/UltimateServerProtector/releases/"

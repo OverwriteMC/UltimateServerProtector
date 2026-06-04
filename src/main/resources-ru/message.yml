@@ -83,4 +83,4 @@ system:
   update-success-2: "§aПерезапустите сервер, чтобы применить обновление."
   update-outdated-1: "§aВы используете устаревшую версию плагина!"
   update-outdated-2: "§aВы можете скачать новую версию здесь:"
-  update-outdated-3: "§bgithub.com/Overwrite987/UltimateServerProtector/releases/"
+  update-outdated-3: "§bgithub.com/OverwriteMC/UltimateServerProtector/releases/"
