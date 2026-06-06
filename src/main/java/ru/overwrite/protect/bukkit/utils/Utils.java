@@ -22,7 +22,13 @@ import java.util.function.Consumer;
 @UtilityClass
 public class Utils {
 
-    public final int SUB_VERSION = Integer.parseInt(Bukkit.getBukkitVersion().split("-")[0].split("\\.")[1]);
+    public final int SUB_VERSION;
+
+    static {
+        String versionPart = Bukkit.getBukkitVersion().split("-")[0];
+        String[] parts = versionPart.split("\\.");
+        SUB_VERSION = Integer.parseInt(parts[parts[0].length() == 1 ? 1 : 0]);
+    }
 
     public final boolean FOLIA;
 
