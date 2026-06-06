@@ -17,7 +17,7 @@ public class ServerProtectorCaptureEvent extends ServerProtectorPlayerEvent impl
     private boolean isCancelled = false;
 
     public ServerProtectorCaptureEvent(Player player, String ip, CaptureReason captureReason) {
-        super(player, true);
+        super(player);
         this.player = player;
         this.ip = ip;
         this.captureReason = captureReason;
