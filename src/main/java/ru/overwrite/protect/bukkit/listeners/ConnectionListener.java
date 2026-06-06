@@ -50,38 +50,36 @@ public class ConnectionListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onLogin(PlayerLoginEvent e) {
         final Player player = e.getPlayer();
+        final String playerName = player.getName();
+        CaptureReason captureReason = plugin.checkPermissions(player);
+        if (captureReason == null) {
+            if (api.isCaptured(playerName)) {
+                api.uncapturePlayer(playerName);
+            }
+            return;
+        }
         player.loadData();
-        runner.runAsync(() -> {
-            final String playerName = player.getName();
-            CaptureReason captureReason = plugin.checkPermissions(player);
-            if (captureReason == null) {
-                if (api.isCaptured(playerName)) {
-                    api.uncapturePlayer(playerName);
+        final String ip = e.getAddress().getHostAddress();
+        if (pluginConfig.getSecureSettings().enableIpWhitelist()) {
+            if (!isIPAllowed(ip, pluginConfig.getAccessData().ipWhitelist().get(playerName))) {
+                if (!api.isExcluded(playerName, pluginConfig.getExcludedPlayers().ipWhitelist())) {
+                    plugin.checkFail(playerName, pluginConfig.getCommands().notAdminIp());
                 }
-                return;
             }
-            final String ip = e.getAddress().getHostAddress();
-            if (pluginConfig.getSecureSettings().enableIpWhitelist()) {
-                if (!isIPAllowed(ip, pluginConfig.getAccessData().ipWhitelist().get(playerName))) {
-                    if (!api.isExcluded(playerName, pluginConfig.getExcludedPlayers().ipWhitelist())) {
-                        plugin.checkFail(playerName, pluginConfig.getCommands().notAdminIp());
+        }
+        if (!pluginConfig.getSessionSettings().session() || !api.hasSession(playerName, ip)) {
+            if (!api.isExcluded(playerName, pluginConfig.getExcludedPlayers().adminPass())) {
+                RegisteredListener[] listeners = ServerProtectorCaptureEvent.getHandlerList().getRegisteredListeners();
+                if (listeners.length != 0) {
+                    ServerProtectorCaptureEvent captureEvent = new ServerProtectorCaptureEvent(player, ip, captureReason);
+                    captureEvent.callEvent();
+                    if (pluginConfig.getApiSettings().allowCancelCaptureEvent() && captureEvent.isCancelled()) {
+                        return;
                     }
                 }
+                api.capturePlayer(playerName);
             }
-            if (!pluginConfig.getSessionSettings().session() || !api.hasSession(playerName, ip)) {
-                if (!api.isExcluded(playerName, pluginConfig.getExcludedPlayers().adminPass())) {
-                    RegisteredListener[] listeners = ServerProtectorCaptureEvent.getHandlerList().getRegisteredListeners();
-                    if (listeners.length != 0) {
-                        ServerProtectorCaptureEvent captureEvent = new ServerProtectorCaptureEvent(player, ip, captureReason);
-                        captureEvent.callEvent();
-                        if (pluginConfig.getApiSettings().allowCancelCaptureEvent() && captureEvent.isCancelled()) {
-                            return;
-                        }
-                    }
-                    api.capturePlayer(playerName);
-                }
-            }
-        });
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
