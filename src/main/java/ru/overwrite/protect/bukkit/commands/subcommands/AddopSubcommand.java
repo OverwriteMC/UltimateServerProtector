@@ -7,6 +7,7 @@ import ru.overwrite.protect.bukkit.ServerProtectorManager;
 import ru.overwrite.protect.bukkit.configuration.data.UspMessages;
 import ru.overwrite.protect.bukkit.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AddopSubcommand extends AbstractSubCommand {
@@ -30,10 +31,11 @@ public class AddopSubcommand extends AbstractSubCommand {
                 nickname = targetPlayer.getName();
             }
 
-            List<String> whitelist = pluginConfig.getAccessData().opWhitelist();
+            List<String> whitelist = new ArrayList<>(pluginConfig.getAccessData().opWhitelist());
             whitelist.add(nickname);
             plugin.getConfig().set("op-whitelist", whitelist);
             plugin.saveConfig();
+            plugin.getPluginConfig().loadAccessData(plugin.getConfig());
             sender.sendMessage(uspMessages.playerAdded().replace("%nick%", nickname));
             return true;
         }
