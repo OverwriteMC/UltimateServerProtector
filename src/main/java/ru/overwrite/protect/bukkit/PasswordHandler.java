@@ -120,6 +120,9 @@ public final class PasswordHandler {
             }
         }
         String playerName = player.getName();
+        if (pluginConfig.getPunishSettings().enableAttempts()) {
+            attempts.removeInt(playerName);
+        }
         api.uncapturePlayer(playerName);
         player.sendMessage(pluginConfig.getMessages().correct());
         if (pluginConfig.getMessageSettings().sendTitle()) {
