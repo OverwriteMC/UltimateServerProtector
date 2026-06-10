@@ -102,7 +102,7 @@ public class ConnectionListener implements Listener {
             if (pluginConfig.getBroadcasts() != null) {
                 plugin.sendAlert(player, pluginConfig.getBroadcasts().joined());
             }
-        }, 2L);
+        }, 1L);
     }
 
     private boolean isIPAllowed(String playerIp, List<String> allowedIps) {
