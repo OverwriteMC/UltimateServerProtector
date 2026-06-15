@@ -50,7 +50,7 @@ public final class TaskManager {
                     continue;
                 }
                 if (!api.isAuthorised(onlinePlayer)) {
-                    ServerProtectorCaptureEvent captureEvent = new ServerProtectorCaptureEvent(onlinePlayer, Utils.getIp(onlinePlayer), captureReason);
+                    ServerProtectorCaptureEvent captureEvent = new ServerProtectorCaptureEvent(onlinePlayer, Utils.getIp(onlinePlayer), captureReason, true);
                     RegisteredListener[] listeners = captureEvent.getHandlers().getRegisteredListeners();
                     if (listeners.length != 0) {
                         captureEvent.callEvent();

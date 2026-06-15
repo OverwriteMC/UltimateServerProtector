@@ -71,7 +71,7 @@ public class ConnectionListener implements Listener {
             if (!api.isExcluded(playerName, pluginConfig.getExcludedPlayers().adminPass())) {
                 RegisteredListener[] listeners = ServerProtectorCaptureEvent.getHandlerList().getRegisteredListeners();
                 if (listeners.length != 0) {
-                    ServerProtectorCaptureEvent captureEvent = new ServerProtectorCaptureEvent(player, ip, captureReason);
+                    ServerProtectorCaptureEvent captureEvent = new ServerProtectorCaptureEvent(player, ip, captureReason, false);
                     captureEvent.callEvent();
                     if (pluginConfig.getApiSettings().allowCancelCaptureEvent() && captureEvent.isCancelled()) {
                         return;
