@@ -131,6 +131,7 @@ public final class TaskManager {
                     if (onlinePlayer.hasPermission(blacklistedPerm) &&
                             !api.isExcluded(onlinePlayer, pluginConfig.getExcludedPlayers().blacklistedPerms())) {
                         plugin.checkFail(onlinePlayer.getName(), pluginConfig.getCommands().haveBlacklistedPerm());
+                        break;
                     }
                 }
             }
