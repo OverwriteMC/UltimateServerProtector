@@ -161,6 +161,6 @@ public final class TaskManager {
                     perPlayerTime.removeInt(playerName);
                 }
             }
-        }, 5L, 15L);
+        }, 5L, 20L);
     }
 }
