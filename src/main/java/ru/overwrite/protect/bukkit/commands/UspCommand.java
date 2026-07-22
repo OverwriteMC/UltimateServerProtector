@@ -51,6 +51,10 @@ public final class UspCommand implements TabExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
+        if (pluginConfig.getSecureSettings().onlyConsoleUsp() && !(sender instanceof ConsoleCommandSender)) {
+            sender.sendMessage(pluginConfig.getUspMessages().consoleOnly());
+            return false;
+        }
         if (args.length == 0) {
             sendHelp(sender, label);
             return true;
@@ -60,10 +64,6 @@ public final class UspCommand implements TabExecutor {
             if (subCommand.isAdminCommand()) {
                 if (!pluginConfig.getMainSettings().enableAdminCommands()) {
                     sendHelp(sender, label);
-                    return false;
-                }
-                if (pluginConfig.getSecureSettings().onlyConsoleUsp() && !(sender instanceof ConsoleCommandSender)) {
-                    sender.sendMessage(pluginConfig.getUspMessages().consoleOnly());
                     return false;
                 }
             }
@@ -118,27 +118,38 @@ public final class UspCommand implements TabExecutor {
         }
         final List<String> completions = new ArrayList<>();
         if (args.length == 1) {
-            completions.add("logout");
-            completions.add("reload");
-            completions.add("reboot");
+            addCompletion(sender, completions, "logout", "serverprotector.protect");
+            addCompletion(sender, completions, "reload", "serverprotector.reload");
+            addCompletion(sender, completions, "reboot", "serverprotector.reboot");
+            addCompletion(sender, completions, "genpass", "serverprotector.genpass");
             if (pluginConfig.getEncryptionSettings().enableEncryption()) {
-                completions.add("encrypt");
+                addCompletion(sender, completions, "encrypt", "serverprotector.encrypt");
             }
             if (pluginConfig.getMainSettings().enableAdminCommands()) {
-                completions.add("setpass");
-                completions.add("rempass");
-                completions.add("addop");
-                completions.add("remop");
-                completions.add("addip");
-                completions.add("remip");
-                completions.add("debug");
+                addCompletion(sender, completions, "setpass", "serverprotector.setpass");
+                addCompletion(sender, completions, "rempass", "serverprotector.rempass");
+                addCompletion(sender, completions, "addop", "serverprotector.addop");
+                addCompletion(sender, completions, "remop", "serverprotector.remop");
+                addCompletion(sender, completions, "addip", "serverprotector.addip");
+                addCompletion(sender, completions, "remip", "serverprotector.remip");
+                addCompletion(sender, completions, "update", "serverprotector.update");
+                addCompletion(sender, completions, "debug", "serverprotector.debug");
             }
         }
-        if (args.length == 2 && args[0].equalsIgnoreCase("debug")) {
+        if (args.length == 2
+                && pluginConfig.getMainSettings().enableAdminCommands()
+                && sender.hasPermission("serverprotector.debug")
+                && args[0].equalsIgnoreCase("debug")) {
             completions.add("printconfigdata");
             completions.add("checkplayer");
         }
         return getResult(args, completions);
+    }
+
+    private void addCompletion(CommandSender sender, List<String> completions, String completion, String permission) {
+        if (sender.hasPermission(permission)) {
+            completions.add(completion);
+        }
     }
 
     private List<String> getResult(String[] args, List<String> completions) {
