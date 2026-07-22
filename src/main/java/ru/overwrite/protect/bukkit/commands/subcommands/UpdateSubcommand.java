@@ -36,7 +36,10 @@ public class UpdateSubcommand extends AbstractSubCommand {
                 sender.sendMessage(systemMessages.updateLatest());
             } else {
                 String currentJarName = new File(plugin.getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
-                String downloadUrl = "https://github.com/OverwriteMC/UltimateServerProtector/releases/download/" + version + "/" + "UltimateServerProtector.jar";
+                String assetName = currentJarName.contains("-en")
+                        ? "UltimateServerProtector-en.jar"
+                        : "UltimateServerProtector.jar";
+                String downloadUrl = "https://github.com/OverwriteMC/UltimateServerProtector/releases/download/" + version + "/" + assetName;
                 try {
                     File updateFolder = Bukkit.getUpdateFolderFile();
                     File targetFile = new File(updateFolder, currentJarName);
