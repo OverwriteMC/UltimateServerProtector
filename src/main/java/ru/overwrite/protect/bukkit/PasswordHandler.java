@@ -123,6 +123,7 @@ public final class PasswordHandler {
         if (pluginConfig.getPunishSettings().enableAttempts()) {
             attempts.removeInt(playerName);
         }
+        api.authorisePlayer(player);
         api.uncapturePlayer(playerName);
         player.sendMessage(pluginConfig.getMessages().correct());
         if (pluginConfig.getMessageSettings().sendTitle()) {
@@ -137,7 +138,6 @@ public final class PasswordHandler {
             playerManager.removeEffects(player);
         }
         playerManager.showPlayer(player);
-        api.authorisePlayer(player);
         if (pluginConfig.getSessionSettings().sessionTimeEnabled()) {
             plugin.getRunner().runDelayedAsync(() -> {
                 if (api.isAuthorised(player)) {
