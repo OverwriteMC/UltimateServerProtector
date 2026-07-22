@@ -17,9 +17,12 @@ permissions:
       serverprotector.reload: true
       serverprotector.reboot: true
       serverprotector.encrypt: true
+      serverprotector.genpass: true
       serverprotector.setpass: true
       serverprotector.addop: true
       serverprotector.addip: true
       serverprotector.rempass: true
       serverprotector.remop: true
       serverprotector.remip: true
+      serverprotector.update: true
+      serverprotector.debug: true
