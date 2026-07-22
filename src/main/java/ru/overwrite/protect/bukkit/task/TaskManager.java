@@ -39,9 +39,6 @@ public final class TaskManager {
                 return;
             }
             for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                if (api.isExcluded(onlinePlayer, pluginConfig.getExcludedPlayers().adminPass())) {
-                    continue;
-                }
                 if (api.isCaptured(onlinePlayer)) {
                     continue;
                 }
@@ -49,8 +46,14 @@ public final class TaskManager {
                 if (captureReason == null) {
                     continue;
                 }
+                String playerName = onlinePlayer.getName();
+                String playerIp = Utils.getIp(onlinePlayer);
+                playerManager.checkIpWhitelist(playerName, playerIp);
+                if (api.isExcluded(onlinePlayer, pluginConfig.getExcludedPlayers().adminPass())) {
+                    continue;
+                }
                 if (!api.isAuthorised(onlinePlayer)) {
-                    ServerProtectorCaptureEvent captureEvent = new ServerProtectorCaptureEvent(onlinePlayer, Utils.getIp(onlinePlayer), captureReason, true);
+                    ServerProtectorCaptureEvent captureEvent = new ServerProtectorCaptureEvent(onlinePlayer, playerIp, captureReason, true);
                     RegisteredListener[] listeners = captureEvent.getHandlers().getRegisteredListeners();
                     if (listeners.length != 0) {
                         captureEvent.callEvent();

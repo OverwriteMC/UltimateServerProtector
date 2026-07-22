@@ -3,7 +3,6 @@ package ru.overwrite.protect.bukkit;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import ru.overwrite.protect.bukkit.configuration.Config;
 import ru.overwrite.protect.bukkit.configuration.data.BlockingSettings;
@@ -12,11 +11,12 @@ import ru.overwrite.protect.bukkit.task.runner.Runner;
 
 import java.util.Collection;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class PlayerManager {
 
-    private final Plugin plugin;
+    private final ServerProtectorManager plugin;
     private final Runner runner;
     private final Config config;
 
@@ -69,6 +69,47 @@ public class PlayerManager {
                 }
             }
         }, player);
+    }
+
+    public void checkIpWhitelist(String playerName, String playerIp) {
+        if (!config.getSecureSettings().enableIpWhitelist()) {
+            return;
+        }
+        if (!isIpAllowed(playerIp, config.getAccessData().ipWhitelist().get(playerName))
+                && !plugin.getApi().isExcluded(playerName, config.getExcludedPlayers().ipWhitelist())) {
+            plugin.checkFail(playerName, config.getCommands().notAdminIp());
+        }
+    }
+
+    private boolean isIpAllowed(String playerIp, List<String> allowedIps) {
+        if (allowedIps == null || allowedIps.isEmpty()) {
+            return false;
+        }
+
+        outer:
+        for (int i = 0; i < allowedIps.size(); i++) {
+            final String allowedIp = allowedIps.get(i);
+            int playerIpLength = playerIp.length();
+            int allowedIpLength = allowedIp.length();
+
+            if (playerIpLength != allowedIpLength && !allowedIp.contains("*")) {
+                continue;
+            }
+
+            for (int n = 0; n < allowedIpLength; n++) {
+                char currentChar = allowedIp.charAt(n);
+                if (currentChar == '*') {
+                    return true;
+                }
+                if (n >= playerIpLength || currentChar != playerIp.charAt(n)) {
+                    continue outer;
+                }
+            }
+            if (playerIpLength == allowedIpLength) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void showPlayer(Player player) {

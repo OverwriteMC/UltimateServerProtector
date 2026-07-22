@@ -19,7 +19,6 @@ import ru.overwrite.protect.bukkit.configuration.Config;
 import ru.overwrite.protect.bukkit.task.runner.Runner;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class ConnectionListener implements Listener {
 
@@ -60,13 +59,7 @@ public class ConnectionListener implements Listener {
         }
         player.loadData();
         final String ip = e.getAddress().getHostAddress();
-        if (pluginConfig.getSecureSettings().enableIpWhitelist()) {
-            if (!isIPAllowed(ip, pluginConfig.getAccessData().ipWhitelist().get(playerName))) {
-                if (!api.isExcluded(playerName, pluginConfig.getExcludedPlayers().ipWhitelist())) {
-                    plugin.checkFail(playerName, pluginConfig.getCommands().notAdminIp());
-                }
-            }
-        }
+        playerManager.checkIpWhitelist(playerName, ip);
         if (!pluginConfig.getSessionSettings().session() || !api.hasSession(playerName, ip)) {
             if (!api.isExcluded(playerName, pluginConfig.getExcludedPlayers().adminPass())) {
                 RegisteredListener[] listeners = ServerProtectorCaptureEvent.getHandlerList().getRegisteredListeners();
@@ -103,40 +96,6 @@ public class ConnectionListener implements Listener {
                 plugin.sendAlert(player, pluginConfig.getBroadcasts().joined());
             }
         }, 1L);
-    }
-
-    private boolean isIPAllowed(String playerIp, List<String> allowedIps) {
-        if (allowedIps == null || allowedIps.isEmpty()) {
-            return false;
-        }
-
-        outer:
-        for (int i = 0; i < allowedIps.size(); i++) {
-            final String allowedIp = allowedIps.get(i);
-            int playerIpLength = playerIp.length();
-            int allowedIpLength = allowedIp.length();
-
-            if (playerIpLength != allowedIpLength && !allowedIp.contains("*")) {
-                continue;
-            }
-
-            for (int n = 0; n < allowedIpLength; n++) {
-                char currentChar = allowedIp.charAt(n);
-                if (currentChar == '*') {
-                    return true;
-                }
-
-                if (n >= playerIpLength || currentChar != playerIp.charAt(n)) {
-                    continue outer;
-                }
-            }
-
-            if (playerIpLength == allowedIpLength) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
