@@ -199,6 +199,8 @@ logging-settings:
   logging-join: true
   # Log plugin enabling and disabling to file
   logging-enable-disable: true
+  # Log commands executed as punishments to file
+  logging-command-execution: true
 
 # Commands applied to offenders
 commands:
