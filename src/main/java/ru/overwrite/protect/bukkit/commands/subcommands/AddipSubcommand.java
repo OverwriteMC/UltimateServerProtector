@@ -16,16 +16,23 @@ public class AddipSubcommand extends AbstractSubCommand {
     public boolean execute(CommandSender sender, String label, String[] args) {
         UspMessages uspMessages = pluginConfig.getUspMessages();
         if (args.length > 2) {
-            String nickname = args[1];
-            List<String> ipwl = pluginConfig.getAccessData().ipWhitelist().get(nickname);
-            if (ipwl == null || ipwl.isEmpty()) {
-                sender.sendMessage(uspMessages.playerNotFound().replace("%nick%", nickname));
+            String nickname = pluginConfig.getStoredNickname(args[1]);
+            List<String> ips = List.of(args).subList(2, args.length);
+            List<String> ipwl = plugin.getConfig().getStringList("ip-whitelist." + nickname);
+            boolean added = false;
+            for (String ip : ips) {
+                if (!ipwl.contains(ip)) {
+                    ipwl.add(ip);
+                    added = true;
+                }
+            }
+            if (!added) {
+                sender.sendMessage(uspMessages.alreadyInConfig());
                 return true;
             }
-            List<String> ips = List.of(args).subList(2, args.length);
-            ipwl.addAll(ips);
             plugin.getConfig().set("ip-whitelist." + nickname, ipwl);
             plugin.saveConfig();
+            plugin.getPluginConfig().loadAccessData(plugin.getConfig());
             sender.sendMessage(uspMessages.ipAdded().replace("%nick%", nickname).replace("%ip%", ips.toString()));
             return true;
         }

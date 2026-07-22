@@ -20,18 +20,20 @@ public class AddopSubcommand extends AbstractSubCommand {
     public boolean execute(CommandSender sender, String label, String[] args) {
         UspMessages uspMessages = pluginConfig.getUspMessages();
         if (args.length > 1) {
-            String nickname = args[1];
-
-            if (Utils.SUB_VERSION >= 16) {
-                OfflinePlayer targetPlayer = Bukkit.getOfflinePlayerIfCached(nickname);
-                if (targetPlayer == null) {
-                    sender.sendMessage(uspMessages.playerNotFound().replace("%nick%", nickname));
+            String nickname = pluginConfig.normalizeGeyserNickname(args[1]);
+            OfflinePlayer targetPlayer = findOfflinePlayer(nickname);
+            if (targetPlayer == null) {
+                sender.sendMessage(uspMessages.playerNotFound().replace("%nick%", nickname));
+                return true;
+            }
+            nickname = pluginConfig.getStoredNickname(targetPlayer.getName());
+            List<String> whitelist = new ArrayList<>(plugin.getConfig().getStringList("op-whitelist"));
+            for (String whitelistedPlayer : whitelist) {
+                if (whitelistedPlayer.equalsIgnoreCase(nickname)) {
+                    sender.sendMessage(uspMessages.alreadyInConfig());
                     return true;
                 }
-                nickname = targetPlayer.getName();
             }
-
-            List<String> whitelist = new ArrayList<>(pluginConfig.getAccessData().opWhitelist());
             whitelist.add(nickname);
             plugin.getConfig().set("op-whitelist", whitelist);
             plugin.saveConfig();
@@ -42,5 +44,18 @@ public class AddopSubcommand extends AbstractSubCommand {
 
         sendCmdUsage(sender, uspMessages.addOpUsage(), label);
         return true;
+    }
+
+    private OfflinePlayer findOfflinePlayer(String nickname) {
+        if (Utils.SUB_VERSION >= 16 && plugin.isPaper()) {
+            return Bukkit.getOfflinePlayerIfCached(nickname);
+        }
+        for (OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
+            String playerName = offlinePlayer.getName();
+            if (playerName != null && playerName.equalsIgnoreCase(nickname)) {
+                return offlinePlayer;
+            }
+        }
+        return null;
     }
 }
