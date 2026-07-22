@@ -85,7 +85,7 @@ public final class UspCommand implements TabExecutor {
         UspMessages uspMessages = pluginConfig.getUspMessages();
         sendCmdMessage(sender, uspMessages.usage(), label, "protect");
         sendCmdMessage(sender, uspMessages.usageLogout(), label, "protect");
-        if (!sender.hasPermission("admin")) {
+        if (!sender.hasPermission("serverprotector.admin")) {
             return;
         }
         sendCmdMessage(sender, uspMessages.usageReload(), label, "reload");
