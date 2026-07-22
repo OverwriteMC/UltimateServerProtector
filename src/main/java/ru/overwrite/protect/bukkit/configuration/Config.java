@@ -40,9 +40,7 @@ public final class Config {
         Set<String> keys = data.getKeys(false);
         Map<String, String> perPlayerPasswords = new HashMap<>(keys.size());
         for (String nick : keys) {
-            String playerNick = !this.geyserSettings.prefix().isBlank() && this.geyserSettings.nicknames().contains(nick)
-                    ? this.geyserSettings.prefix() + nick
-                    : nick;
+            String playerNick = normalizeGeyserNickname(nick);
             if (!this.encryptionSettings.enableEncryption()) {
                 perPlayerPasswords.put(playerNick, data.getString(nick + ".pass"));
                 continue;
@@ -78,7 +76,7 @@ public final class Config {
             section.set("pas-command", "pas");
             section.set("use-command", true);
             section.set("enable-admin-commands", false);
-            section.set("check-interval", 40);
+            section.set("check-interval", 30);
             section.set("papi-support", false);
             section.set("suppress-api-warnings", false);
             save(plugin.getDataFolder().getAbsolutePath(), config, "config.yml", false);
@@ -87,10 +85,10 @@ public final class Config {
         }
         this.mainSettings = new MainSettings(
                 mainSettings.getString("prefix", "[UltimateServerProtector]"),
-                mainSettings.getString("pas-command", "pas"),
+                mainSettings.getString("pas-command", "pas").toLowerCase(Locale.ENGLISH),
                 mainSettings.getBoolean("use-command", true),
                 mainSettings.getBoolean("enable-admin-commands", false),
-                mainSettings.getLong("check-interval", 40),
+                mainSettings.getLong("check-interval", 30),
                 mainSettings.getBoolean("papi-support", false),
                 mainSettings.getBoolean("suppress-api-warnings", false)
         );
@@ -209,7 +207,7 @@ public final class Config {
             pluginLogger.warn("Configuration section session-settings not found!");
             ConfigurationSection section = config.createSection("session-settings");
             section.set("session", true);
-            section.set("session-time-enabled", true);
+            section.set("session-time-enabled", false);
             section.set("session-time", 21600);
             save(plugin.getDataFolder().getAbsolutePath(), config, "config.yml", false);
             pluginLogger.info("Created section session-settings");
@@ -217,7 +215,7 @@ public final class Config {
         }
         this.sessionSettings = new SessionSettings(
                 sessionSettings.getBoolean("session", true),
-                sessionSettings.getBoolean("session-time-enabled", true),
+                sessionSettings.getBoolean("session-time-enabled", false),
                 sessionSettings.getInt("session-time", 21600)
         );
     }
@@ -263,6 +261,7 @@ public final class Config {
             section.set("only-console-usp", false);
             section.set("enable-excluded-players", false);
             section.set("use-fake-plugin", true);
+            section.set("shutdown-on-disable", true);
             save(plugin.getDataFolder().getAbsolutePath(), config, "config.yml", false);
             pluginLogger.info("Created section secure-settings");
             secureSettings = section;
@@ -327,7 +326,7 @@ public final class Config {
         if (bossbarSettings == null) {
             pluginLogger.warn("Configuration section bossbar-settings not found!");
             ConfigurationSection section = config.createSection("bossbar-settings");
-            section.set("enable-bossbar", false);
+            section.set("enable-bossbar", true);
             section.set("bar-color", "RED");
             section.set("bar-style", "SEGMENTED_12");
             save(plugin.getDataFolder().getAbsolutePath(), config, "config.yml", false);
@@ -352,7 +351,7 @@ public final class Config {
         if (soundSettings == null) {
             pluginLogger.warn("Configuration section sound-settings not found!");
             ConfigurationSection section = config.createSection("sound-settings");
-            section.set("enable-sounds", false);
+            section.set("enable-sounds", true);
             section.set("on-capture", "ENTITY_ITEM_BREAK;1.0;1.0");
             section.set("on-pas-fail", "ENTITY_VILLAGER_NO;1.0;1.0");
             section.set("on-pas-correct", "ENTITY_PLAYER_LEVELUP;1.0;1.0");
@@ -361,7 +360,7 @@ public final class Config {
             soundSettings = section;
         }
         this.soundSettings = new SoundSettings(
-                soundSettings.getBoolean("enable-sounds"),
+                soundSettings.getBoolean("enable-sounds", true),
                 soundSettings.getString("on-capture", "ENTITY_ITEM_BREAK;1.0;1.0").split(";"),
                 soundSettings.getString("on-pas-fail", "ENTITY_VILLAGER_NO;1.0;1.0").split(";"),
                 soundSettings.getString("on-pas-correct", "ENTITY_PLAYER_LEVELUP;1.0;1.0").split(";")
@@ -470,7 +469,7 @@ public final class Config {
         Map<String, List<String>> ipWhitelist = Map.of();
 
         if (secureSettings.getBoolean("enable-op-whitelist")) {
-            opWhitelist = List.copyOf(config.getStringList("op-whitelist"));
+            opWhitelist = normalizeGeyserNicknames(config.getStringList("op-whitelist"));
         }
         if (secureSettings.getBoolean("enable-permission-blacklist")) {
             blacklistedPerms = Set.copyOf(config.getStringList("blacklisted-perms"));
@@ -481,7 +480,7 @@ public final class Config {
             Map<String, List<String>> ipWhitelistTemp = new HashMap<>(keys.size());
             for (String ipwlPlayer : keys) {
                 List<String> ips = List.copyOf(ipwlSection.getStringList(ipwlPlayer));
-                ipWhitelistTemp.put(ipwlPlayer, ips);
+                ipWhitelistTemp.put(normalizeGeyserNickname(ipwlPlayer), ips);
             }
             ipWhitelist = Map.copyOf(ipWhitelistTemp);
         }
@@ -498,12 +497,40 @@ public final class Config {
     public void setupExcluded(FileConfiguration config) {
         ConfigurationSection excludedPlayers = config.getConfigurationSection("excluded-players");
         this.excludedPlayers = new ExcludedPlayers(
-                List.copyOf(excludedPlayers.getStringList("admin-pass")),
-                List.copyOf(excludedPlayers.getStringList("op-whitelist")),
-                List.copyOf(excludedPlayers.getStringList("ip-whitelist")),
-                List.copyOf(excludedPlayers.getStringList("blacklisted-perms")),
-                List.copyOf(excludedPlayers.getStringList("alert"))
+                normalizeGeyserNicknames(excludedPlayers.getStringList("admin-pass")),
+                normalizeGeyserNicknames(excludedPlayers.getStringList("op-whitelist")),
+                normalizeGeyserNicknames(excludedPlayers.getStringList("ip-whitelist")),
+                normalizeGeyserNicknames(excludedPlayers.getStringList("blacklisted-perms")),
+                normalizeGeyserNicknames(excludedPlayers.getStringList("alert"))
         );
+    }
+
+    public String normalizeGeyserNickname(String nickname) {
+        return !geyserSettings.prefix().isBlank() && geyserSettings.nicknames().contains(nickname)
+                ? geyserSettings.prefix() + nickname
+                : nickname;
+    }
+
+    public String getStoredNickname(String nickname) {
+        String prefix = geyserSettings.prefix();
+        if (!prefix.isBlank() && nickname.startsWith(prefix)) {
+            String unprefixedNickname = nickname.substring(prefix.length());
+            if (geyserSettings.nicknames().contains(unprefixedNickname)) {
+                return unprefixedNickname;
+            }
+        }
+        return nickname;
+    }
+
+    private List<String> normalizeGeyserNicknames(List<String> nicknames) {
+        if (nicknames.isEmpty()) {
+            return List.of();
+        }
+        List<String> normalizedNicknames = new ArrayList<>(nicknames.size());
+        for (String nickname : nicknames) {
+            normalizedNicknames.add(normalizeGeyserNickname(nickname));
+        }
+        return List.copyOf(normalizedNicknames);
     }
 
     private UspMessages uspMessages;
@@ -629,6 +656,7 @@ public final class Config {
         File file = new File(path, fileName);
         if (!file.exists()) {
             plugin.saveResource(fileName, false);
+            file = new File(plugin.getDataFolder(), fileName);
         }
         return YamlConfiguration.loadConfiguration(file);
     }

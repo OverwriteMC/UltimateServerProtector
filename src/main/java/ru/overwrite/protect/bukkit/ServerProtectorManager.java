@@ -44,6 +44,7 @@ import java.lang.reflect.Constructor;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 
 @Getter
 public class ServerProtectorManager extends JavaPlugin {
@@ -82,6 +83,8 @@ public class ServerProtectorManager extends JavaPlugin {
 
     protected void setupRunner(Plugin plugin) {
         runner = Utils.FOLIA ? new PaperRunner(this, plugin) : new BukkitRunner(this, plugin);
+        playerManager = new PlayerManager(this);
+        passwordHandler = new PasswordHandler(this);
     }
 
     protected Plugin getRuntimePlugin(PluginManager pluginManager) {
@@ -156,29 +159,27 @@ public class ServerProtectorManager extends JavaPlugin {
     }
 
     public void reloadConfigs(FileConfiguration config) {
-        runner.runAsync(() -> {
-            this.config = config;
-            ColorizerProvider.init(config.getConfigurationSection("main-settings"));
-            String absolutePath = getDataFolder().getAbsolutePath();
-            messageFile = pluginConfig.getFile(absolutePath, "message.yml");
-            final ConfigurationSection fileSettings = config.getConfigurationSection("file-settings");
-            boolean fullPath = fileSettings.getBoolean("use-full-path", false);
-            dataFilePath = fullPath ? fileSettings.getString("data-file-path") : absolutePath;
-            dataFileName = fileSettings.getString("data-file");
-            dataFile = pluginConfig.getFile(dataFilePath, dataFileName);
-            setupPluginConfig(config);
-            pluginConfig.setupPasswords(dataFile);
-        });
+        this.config = config;
+        ColorizerProvider.init(config.getConfigurationSection("main-settings"));
+        String absolutePath = getDataFolder().getAbsolutePath();
+        messageFile = pluginConfig.getFile(absolutePath, "message.yml");
+        final ConfigurationSection fileSettings = config.getConfigurationSection("file-settings");
+        boolean fullPath = fileSettings.getBoolean("use-full-path", false);
+        dataFilePath = fullPath ? fileSettings.getString("data-file-path") : absolutePath;
+        dataFileName = fileSettings.getString("data-file");
+        dataFile = pluginConfig.getFile(dataFilePath, dataFileName);
+        setupPluginConfig(config);
+        pluginConfig.setupPasswords(dataFile);
     }
 
     private void setupPluginConfig(FileConfiguration config) {
-        pluginConfig.setupExcluded(config);
         pluginConfig.loadMainSettings(config);
         pluginConfig.loadEncryptionSettings(config);
         pluginConfig.loadSecureSettings(config);
+        pluginConfig.loadGeyserSettings(config);
+        pluginConfig.setupExcluded(config);
         pluginConfig.loadAccessData(config);
         pluginConfig.loadApiSettings(config);
-        pluginConfig.loadGeyserSettings(config);
         pluginConfig.loadAdditionalChecks(config);
         pluginConfig.loadPunishSettings(config);
         pluginConfig.loadSessionSettings(config);
@@ -224,7 +225,8 @@ public class ServerProtectorManager extends JavaPlugin {
                     commandMap.getKnownCommands().remove("pas");
                     Constructor<PluginCommand> constructor = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
                     constructor.setAccessible(true);
-                    PluginCommand command = constructor.newInstance(mainSettings.getString("pas-command", "pas"), this);
+                    String commandName = mainSettings.getString("pas-command", "pas").toLowerCase(Locale.ENGLISH);
+                    PluginCommand command = constructor.newInstance(commandName, this);
                     commandMap.register(getDescription().getName(), command);
                     command.setExecutor(new PasCommand(this));
                 } catch (Exception ex) {
@@ -243,8 +245,6 @@ public class ServerProtectorManager extends JavaPlugin {
     }
 
     public void startTasks(FileConfiguration config) {
-        this.playerManager = new PlayerManager(this);
-        this.passwordHandler = new PasswordHandler(this);
         TaskManager taskManager = new TaskManager(this);
         taskManager.startMainCheck(pluginConfig.getMainSettings().checkInterval());
         taskManager.startCapturesMessages(config);
@@ -411,6 +411,6 @@ public class ServerProtectorManager extends JavaPlugin {
 
     @Override
     public void saveConfig() {
-        pluginConfig.save(getDataFolder().getAbsolutePath(), this.config, "config.yml", true);
+        pluginConfig.save(getDataFolder().getAbsolutePath(), this.config, "config.yml", false);
     }
 }
