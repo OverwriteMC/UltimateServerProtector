@@ -59,6 +59,9 @@ public final class TaskManager {
                         continue;
                     }
                     api.capturePlayer(onlinePlayer);
+                    if (pluginConfig.getBlockingSettings().blockTabComplete()) {
+                        runner.runPlayer(onlinePlayer::updateCommands, onlinePlayer);
+                    }
                     if (pluginConfig.getSoundSettings().enableSounds()) {
                         Utils.sendSound(pluginConfig.getSoundSettings().onCapture(), onlinePlayer);
                     }
