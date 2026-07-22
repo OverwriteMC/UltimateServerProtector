@@ -56,7 +56,7 @@ public final class ServerProtector extends ServerProtectorManager {
             messenger.unregisterOutgoingPluginChannel(this);
             messenger.unregisterIncomingPluginChannel(this);
         }
-        if (getConfig().getBoolean("secure-settings.shutdown-on-disable")) {
+        if (getConfig().getBoolean("secure-settings.shutdown-on-disable", true)) {
             server.shutdown();
         }
     }
