@@ -350,7 +350,7 @@ public final class ServerProtectorAPI {
      * @return the new total number of rejoins
      */
     public int addRejoin(@NotNull String playerName, int amount) {
-        return rejoins.addTo(playerName, amount);
+        return rejoins.addTo(playerName, amount) + amount;
     }
 
     /**
