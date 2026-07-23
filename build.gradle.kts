@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "ru.overwrite.protect"
-version = "37.0"
+version = "38.0"
 description = "UltimateServerProtector Plugin"
 
 val lang = project.findProperty("lang")?.toString() ?: "ru"
