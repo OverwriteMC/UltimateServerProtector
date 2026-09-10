@@ -150,9 +150,9 @@ public class ServerProtectorManager extends JavaPlugin {
         String absolutePath = getDataFolder().getAbsolutePath();
         dataFilePath = fullPath ? fileSettings.getString("data-file-path") : absolutePath;
         dataFileName = fileSettings.getString("data-file");
-        dataFile = pluginConfig.getFile(dataFilePath, dataFileName);
+        dataFile = pluginConfig.getFile(dataFilePath, dataFileName, "data.yml");
         pluginConfig.save(dataFilePath, dataFile, dataFileName, false);
-        messageFile = pluginConfig.getFile(absolutePath, "message.yml");
+        messageFile = pluginConfig.getFile(absolutePath, "message.yml", "message.yml");
         pluginConfig.save(absolutePath, messageFile, "message.yml", false);
         setupPluginConfig(config);
         pluginConfig.setupPasswords(dataFile);
@@ -162,12 +162,12 @@ public class ServerProtectorManager extends JavaPlugin {
         this.config = config;
         ColorizerProvider.init(config.getConfigurationSection("main-settings"));
         String absolutePath = getDataFolder().getAbsolutePath();
-        messageFile = pluginConfig.getFile(absolutePath, "message.yml");
+        messageFile = pluginConfig.getFile(absolutePath, "message.yml", "message.yml");
         final ConfigurationSection fileSettings = config.getConfigurationSection("file-settings");
         boolean fullPath = fileSettings.getBoolean("use-full-path", false);
         dataFilePath = fullPath ? fileSettings.getString("data-file-path") : absolutePath;
         dataFileName = fileSettings.getString("data-file");
-        dataFile = pluginConfig.getFile(dataFilePath, dataFileName);
+        dataFile = pluginConfig.getFile(dataFilePath, dataFileName, "data.yml");
         setupPluginConfig(config);
         pluginConfig.setupPasswords(dataFile);
     }

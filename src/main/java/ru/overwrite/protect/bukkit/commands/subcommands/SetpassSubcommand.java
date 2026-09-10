@@ -53,7 +53,7 @@ public class SetpassSubcommand extends AbstractSubCommand {
 
     private void addAdmin(String nick, String pas) {
         nick = pluginConfig.getStoredNickname(nick);
-        FileConfiguration dataFile = pluginConfig.getFile(plugin.getDataFilePath(), plugin.getDataFileName());
+        FileConfiguration dataFile = pluginConfig.getFile(plugin.getDataFilePath(), plugin.getDataFileName(), "data.yml");
         EncryptionSettings encryptionSettings = pluginConfig.getEncryptionSettings();
         if (!encryptionSettings.enableEncryption()) {
             dataFile.set("data." + nick + ".pass", pas);

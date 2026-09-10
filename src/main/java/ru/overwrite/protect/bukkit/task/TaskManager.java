@@ -109,7 +109,7 @@ public final class TaskManager {
                     }
                 }
             }
-        }, 5L, config.getInt("message-settings.delay") * 20L);
+        }, 5L, config.getInt("message-settings.delay", 2) * 20L);
     }
 
     public void startOpCheck() {

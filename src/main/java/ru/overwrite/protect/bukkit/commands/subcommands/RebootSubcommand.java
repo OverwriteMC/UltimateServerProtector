@@ -13,7 +13,7 @@ public class RebootSubcommand extends AbstractSubCommand {
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
         plugin.getRunner().cancelTasks();
-        FileConfiguration newConfig = pluginConfig.getFile(plugin.getDataFolder().getAbsolutePath(), "config.yml");
+        FileConfiguration newConfig = pluginConfig.getFile(plugin.getDataFolder().getAbsolutePath(), "config.yml", "config.yml");
         plugin.reloadConfigs(newConfig);
         plugin.getPerPlayerTime().clear();
         api.clearCaptured();

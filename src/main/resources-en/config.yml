@@ -47,7 +47,7 @@ encryption-settings:
   # SALT is used to apply salt (random string to an existing password). You can only apply it once.
   encrypt-method: 'BASE64;SALT;SHA256'
   # If you used any encryption method and for some reason decide to change it - you can specify it here so that you don't lose data
-  old-encrypt-methods: []
+  old-encrypt-methods: [ ]
   # The length of the dynamically generated salt. The longer it is, the more effectively passwords are protected.
   salt-length: 24
   # Enable automatic encryption of all existing passwords from the data.yml file when the plugin starts and restarts
@@ -150,7 +150,7 @@ api-settings:
   call-event-on-password-enter: false
   # From which packages is the invocation of authorization methods allowed from the API?
   # Calls to API methods from other packages will be blocked. (By default, only calls from our plugin are allowed)
-  allowed-auth-api-calls-packages: []
+  allowed-auth-api-calls-packages: [ ]
 
 # Message display settings
 message-settings:

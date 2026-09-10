@@ -14,7 +14,7 @@ broadcasts:
   joined: "%prefix% &fAdmin &3%player% &fjoined the game! &fIP: &c%ip%"
   captured: "%prefix% &fPlayer &3%player% &fwas detected with admin-permissions! &fIP: &c%ip%"
   disabled: "%prefix% &6&lWARNING! &fPlugin has been disabled!"
- 
+
 # Titles (format - title;subtitle;fadein;stay;fadeout)
 titles:
   message: '&e&l⚠ &c&lProtection &e&l⚠;&fAdmin permissiond detected! Enter admin-password!;10;60;15'
@@ -56,7 +56,7 @@ uspmsg:
   usage-remop: '&6/%cmd% remop (nick) &7- remove player from op whitelist'
   usage-addip: '&6/%cmd% addip (nick) (IPs) &7- add player and their ip to ip whitelist'
   usage-remip: '&6/%cmd% remip (nick) (IPs) &7- remove player and their ip from ip whitelist'
-  otherdisabled: |- 
+  otherdisabled: |-
     &7Other commands are disabled.
     &7To enable them, set &6enable-admin-commands: &atrue
 

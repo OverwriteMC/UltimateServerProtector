@@ -2,6 +2,7 @@ package ru.overwrite.protect.bukkit.configuration;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.configuration.ConfigurationSection;
@@ -17,6 +18,7 @@ import ru.overwrite.protect.bukkit.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
 
 @Getter
@@ -102,7 +104,7 @@ public final class Config {
             pluginLogger.warn("Configuration section encryption-settings not found!");
             ConfigurationSection section = config.createSection("encryption-settings");
             section.set("enable-encryption", false);
-            section.set("encrypt-method", "");
+            section.set("encrypt-method", "BASE64;SALT;SHA256");
             section.set("old-encrypt-methods", List.of());
             section.set("salt-length", 24);
             section.set("auto-encrypt-passwords", true);
@@ -120,7 +122,7 @@ public final class Config {
     }
 
     private List<String> getEncryptionMethods(ConfigurationSection section) {
-        String encryptionMethod = section.getString("encrypt-method", "").trim();
+        String encryptionMethod = section.getString("encrypt-method", "BASE64;SALT;SHA256").trim();
         if (encryptionMethod.isEmpty()) {
             return List.of();
         }
@@ -305,6 +307,7 @@ public final class Config {
         if (messageSettings == null) {
             pluginLogger.warn("Configuration section message-settings not found!");
             ConfigurationSection section = config.createSection("message-settings");
+            section.set("delay", 2);
             section.set("send-titles", true);
             section.set("enable-broadcasts", true);
             section.set("enable-console-broadcasts", true);
@@ -433,17 +436,16 @@ public final class Config {
         ConfigurationSection commands = config.getConfigurationSection("commands");
         if (commands == null) {
             pluginLogger.warn("Configuration section commands not found!");
-            ConfigurationSection section = config.createSection("commands");
-            section.set("not-in-config", List.of());
-            section.set("not-in-opwhitelist", List.of());
-            section.set("have-blacklisted-perm", List.of());
-            section.set("not-admin-ip", List.of());
-            section.set("failed-pass", List.of());
-            section.set("failed-time", List.of());
-            section.set("failed-rejoin", List.of());
+            commands = config.createSection("commands");
+            commands.set("not-in-config", List.of("kick %player% Вас нет в списке администраторов!", "deop %player%"));
+            commands.set("not-in-opwhitelist", List.of("deop %player%"));
+            commands.set("have-blacklisted-perm", List.of("lp user %player% permission clear"));
+            commands.set("not-admin-ip", List.of("kick %player% Ваш IP не находится в вайтлисте"));
+            commands.set("failed-pass", List.of("ban %player% Вы ввели админ-пароль неверно, ваш аккаунт заморожен", "deop %player%"));
+            commands.set("failed-time", List.of("kick %player% Вы не успели ввести админ-пароль за отведенный срок", "deop %player%"));
+            commands.set("failed-rejoin", List.of("ban %player% Вы слишком часто перезаходили на сервер не вводя пас", "deop %player%"));
             save(plugin.getDataFolder().getAbsolutePath(), config, "config.yml", false);
-            pluginLogger.info("Created section main-settings");
-            commands = section;
+            pluginLogger.info("Created section commands");
         }
         this.commands = new Commands(
                 List.copyOf(commands.getStringList("not-in-config")),
@@ -652,11 +654,18 @@ public final class Config {
         return ColorizerProvider.COLORIZER.colorize(section.getString(key, "&4&lERROR&r: " + key + " does not exist!").replace("%prefix%", mainSettings.prefix()));
     }
 
-    public FileConfiguration getFile(String path, String fileName) {
+    @SneakyThrows(IOException.class)
+    public FileConfiguration getFile(String path, String fileName, String resourceName) {
         File file = new File(path, fileName);
         if (!file.exists()) {
-            plugin.saveResource(fileName, false);
-            file = new File(plugin.getDataFolder(), fileName);
+            File resourceFile = new File(plugin.getDataFolder(), resourceName);
+            if (!resourceFile.exists()) {
+                plugin.saveResource(resourceName, false);
+            }
+            if (!file.exists()) {
+                Files.createDirectories(file.toPath().toAbsolutePath().getParent());
+                Files.copy(resourceFile.toPath(), file.toPath());
+            }
         }
         return YamlConfiguration.loadConfiguration(file);
     }

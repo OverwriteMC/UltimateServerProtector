@@ -12,7 +12,7 @@ public class ReloadSubcommand extends AbstractSubCommand {
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
-        FileConfiguration newConfig = pluginConfig.getFile(plugin.getDataFolder().getAbsolutePath(), "config.yml");
+        FileConfiguration newConfig = pluginConfig.getFile(plugin.getDataFolder().getAbsolutePath(), "config.yml", "config.yml");
         plugin.reloadConfigs(newConfig);
         sender.sendMessage(pluginConfig.getUspMessages().reloaded());
         return true;
